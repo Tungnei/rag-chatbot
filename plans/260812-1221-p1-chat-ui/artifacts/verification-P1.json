@@ -1,0 +1,47 @@
+{
+  "stage": "phase",
+  "plan": "260812-1221-p1-chat-ui",
+  "phase": "P1",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-12T11:05:00+00:00",
+  "checks": [
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 45 passed, 2 warnings in 4.82s (mốc khớp README.md:56 và đếm tĩnh 45 hàm test_)",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "uv run ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "uv run black --check src tests -> 37 files would be left unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "uv run mypy src -> Success: no issues found in 27 source files"
+    },
+    {
+      "name": "toolchain",
+      "status": "PASS",
+      "detail": "uv 0.12.3 cài tại ~/.local/bin; uv sync dựng .venv Python 3.11"
+    },
+    {
+      "name": "branch",
+      "status": "PASS",
+      "detail": "git branch --show-current -> feat/ui-chat-static"
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "Chặn ngoài kế hoạch: mọi HTTPS bị MITM bởi proxy Vingroup, và CA duy nhất trên máy (~/webproxy-ca.pem) là cert trung gian đã hết hạn 2022-10-15. curl/pypi/docker pull đều fail x509.",
+    "Đã gỡ bằng root CA thật tìm được tại '~/Downloads/Webproxy_SSL 11/Vingroup CA.cer' (self-signed Vingroup-Enterprise-CA, hạn 2033). Bundle hợp nhất ghi ra ~/vingroup-ca-bundle.pem; các phase sau export SSL_CERT_FILE trỏ vào đó.",
+    "Chưa cài root CA vào system store (cần sudo) — docker daemon vẫn chưa pull được, sẽ chặn smoke ở phase 6 nếu không xử lý.",
+    "Quan sát cho phase 4: pytest in 'UserWarning: Payload indexes have no effect in the local Qdrant' (vector_search.py:35) — xác nhận chế độ local là bản cài rút gọn, củng cố quyết định dùng scroll thay vì facet."
+  ]
+}

@@ -1,0 +1,18 @@
+schema: plan-approval/v1
+plan: 260812-1221-p1-chat-ui
+plan_hash: 49ebd6081aff
+file_hashes:
+  plan.md: 1b5be2e847fb
+  phase-1-dev-env.md: ff4d446ab68f
+  phase-2-static-mount.md: 095a12b60945
+  phase-3-chat-page.md: bacddaa98c72
+  phase-4-list-endpoint.md: b8c6c6ded839
+  phase-5-admin-page.md: 76783dba3517
+  phase-6-docs-smoke.md: 1c586ea99305
+  plan-graph.yaml: a6fc1323bfb1
+author: user:v.tungnt200@vinsmartfuture.tech
+reviewer: user:v.tungnt200@vinsmartfuture.tech
+verdict: APPROVED
+rationale: Nguoi dung duyet sau khi review truc tiep 7 file plan; chot cook voi --tdd
+ts: '2026-08-12T10:52:01.163916+00:00'
+run_seq: null

@@ -5,10 +5,12 @@ from __future__ import annotations
 import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from rag_chatbot_tung import __version__
 from rag_chatbot_tung.api.routes import router
@@ -17,6 +19,10 @@ from rag_chatbot_tung.logging import get_logger, setup_logging
 from rag_chatbot_tung.orchestrator import RAGOrchestrator
 
 logger = get_logger(__name__)
+
+# The browser UI ships inside the api package, so it travels with the module rather
+# than with the repo layout — Dockerfile already copies src/ wholesale.
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
 def create_app(
@@ -56,4 +62,6 @@ def create_app(
         )
 
     app.include_router(router)
+    # Mounted last and under a prefix: mounting at "/" would swallow every API route.
+    app.mount("/ui", StaticFiles(directory=STATIC_DIR, html=True), name="ui")
     return app

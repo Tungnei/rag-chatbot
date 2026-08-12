@@ -1,0 +1,45 @@
+{
+  "stage": "phase",
+  "plan": "260812-1221-p1-chat-ui",
+  "phase": "P2",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-12T11:12:00+00:00",
+  "checks": [
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 48 passed (45 mốc + 3 test UI mới)",
+      "format": "manual"
+    },
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "Trước implement: 2 failed vì 404 (test_ui_index_served, test_ui_bare_path_redirects_to_index), 1 passed là guard chống che route — đỏ đúng lý do, không phải lỗi import"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check -> 38 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 27 files"
+    },
+    {
+      "name": "no-shadow",
+      "status": "PASS",
+      "detail": "/health và /docs vẫn 200 sau khi mount /ui"
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "Gỡ được [PRIOR] của plan: đo thật bằng follow_redirects=False -> GET /ui trả 307, Location http://testserver/ui/. Xác nhận cờ -L là bắt buộc cho smoke ở phase 6.",
+    "STATIC_DIR dùng Path(__file__).resolve().parent / 'static' (app.py), không bám PROJECT_ROOT — thư mục static thuộc package api/."
+  ]
+}

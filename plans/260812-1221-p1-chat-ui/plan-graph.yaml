@@ -1,0 +1,60 @@
+edges:
+  - {from: P1, to: P2}
+  - {from: P1, to: P4}
+  - {from: P2, to: P3}
+  # P3 -> P5 is a serializing edge as much as a logical one: both phases modify
+  # tests/test_ui.py and styles.css. Without it they would sit in the same
+  # antichain and collide on shared files.
+  - {from: P3, to: P5}
+  # P4 -> P5 is logical: the admin page consumes GET /documents.
+  - {from: P4, to: P5}
+  - {from: P5, to: P6}
+
+subtasks:
+  P1:
+    files_to_create: []
+    files_to_modify: []
+    post: [verification-P1.json]
+  P2:
+    files_to_create:
+      - src/rag_chatbot_tung/api/static/index.html
+      - tests/test_ui.py
+    files_to_modify:
+      - src/rag_chatbot_tung/api/app.py
+    post: [verification-P2.json]
+  P3:
+    files_to_create:
+      - src/rag_chatbot_tung/api/static/styles.css
+      - src/rag_chatbot_tung/api/static/app.js
+    files_to_modify:
+      - src/rag_chatbot_tung/api/static/index.html
+      - tests/test_ui.py
+    post: [verification-P3.json]
+  P4:
+    files_to_create: []
+    files_to_modify:
+      - src/rag_chatbot_tung/validate.py
+      - src/rag_chatbot_tung/adaptor/protocols.py
+      - src/rag_chatbot_tung/retrieval/vector_search.py
+      - src/rag_chatbot_tung/orchestrator.py
+      - src/rag_chatbot_tung/api/routes.py
+      - tests/test_vector_search.py
+      - tests/test_api.py
+    post: [verification-P4.json]
+  P5:
+    files_to_create:
+      - src/rag_chatbot_tung/api/static/admin/index.html
+      - src/rag_chatbot_tung/api/static/admin/admin.js
+    files_to_modify:
+      - src/rag_chatbot_tung/api/static/styles.css
+      - tests/test_ui.py
+    post: [verification-P5.json]
+  P6:
+    files_to_create: []
+    files_to_modify:
+      - README.md
+      - docs/QUICK_REFERENCE.md
+      - docs/PROJECT_STRUCTURE.md
+      - docs/SETUP.md
+      - docs/ARCHITECTURE.md
+    post: [verification-P6.json]
