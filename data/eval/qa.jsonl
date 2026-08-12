@@ -1,0 +1,6 @@
+{"question": "What embedding model is used by default?", "expected_source": "sample_faq.txt"}
+{"question": "Where is the vector data stored?", "expected_source": "sample_faq.txt"}
+{"question": "How do I re-index a document after editing it?", "expected_source": "sample_faq.txt"}
+{"question": "How do I ingest content from a URL?", "expected_source": "sample_guide.md"}
+{"question": "What does the query response contain?", "expected_source": "sample_guide.md"}
+{"question": "What happens if health reports qdrant false?", "expected_source": "sample_guide.md"}

@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rag-chatbot-secrets
+type: Opaque
+stringData:
+  OPENAI_API_KEY: "replace-me"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qdrant
+spec:
+  clusterIP: None
+  selector:
+    app: qdrant
+  ports:
+    - port: 6333
+      name: http
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: qdrant
+spec:
+  serviceName: qdrant
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qdrant
+  template:
+    metadata:
+      labels:
+        app: qdrant
+    spec:
+      containers:
+        - name: qdrant
+          image: qdrant/qdrant:latest
+          ports:
+            - containerPort: 6333
+          volumeMounts:
+            - name: storage
+              mountPath: /qdrant/storage
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-chatbot-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rag-chatbot-api
+  template:
+    metadata:
+      labels:
+        app: rag-chatbot-api
+    spec:
+      containers:
+        - name: api
+          image: rag-chatbot-tung:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: QDRANT__URL
+              value: http://qdrant:6333
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rag-chatbot-secrets
+                  key: OPENAI_API_KEY
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-chatbot-api
+spec:
+  type: ClusterIP
+  selector:
+    app: rag-chatbot-api
+  ports:
+    - port: 80
+      targetPort: 8000

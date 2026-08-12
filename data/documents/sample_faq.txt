@@ -1,0 +1,30 @@
+RAG Chatbot - Frequently Asked Questions
+
+Q: What is this chatbot built with?
+A: The chatbot is built with FastAPI for the REST API, Qdrant as the vector database,
+and OpenAI models for both embeddings and answer generation.
+
+Q: Which document formats are supported?
+A: Plain text (.txt), Markdown (.md), and PDF (.pdf) files are supported. You can also
+ingest content directly from a web page by passing its URL.
+
+Q: How does the chatbot avoid making things up?
+A: The system prompt instructs the model to answer only from the retrieved context.
+If the retrieved documents do not contain the answer, the chatbot replies that the
+information was not found in the indexed documents instead of guessing.
+
+Q: What embedding model is used by default?
+A: The default embedding model is text-embedding-3-small, which produces 1536-dimensional
+vectors. The vector size is configurable in configs/default.yaml.
+
+Q: How many documents are retrieved for each question?
+A: By default the retriever returns the top 3 most similar chunks. This is controlled by
+the retriever.top_k setting.
+
+Q: Where is the vector data stored?
+A: Vectors are stored in a Qdrant collection named "documents". When running through
+docker compose, Qdrant persists its data in a named volume called qdrant_storage.
+
+Q: How do I re-index a document after editing it?
+A: Simply ingest the same source again. The ingestion pipeline deletes all existing
+chunks for that source before inserting the new ones, so no duplicates are created.
