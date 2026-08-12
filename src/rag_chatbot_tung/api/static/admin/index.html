@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quản lý tài liệu — RAG Chatbot</title>
+    <link rel="stylesheet" href="/ui/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Quản lý tài liệu</h1>
+      <nav><a href="/ui/">Về trang chat</a></nav>
+    </header>
+
+    <main class="admin">
+      <p id="no-auth-warning" class="warning">
+        Trang này <strong>không có xác thực</strong> và xoá được toàn bộ index. Chỉ dùng ở
+        localhost — đừng mở cổng 8000 ra mạng khi chưa có lớp bảo vệ phía trước.
+      </p>
+
+      <section class="card">
+        <h2>Nạp tài liệu</h2>
+        <form id="upload-form" autocomplete="off">
+          <p>
+            <input id="file-input" type="file" accept=".txt,.md,.pdf" required />
+          </p>
+          <p class="muted">Chấp nhận .txt, .md, .pdf — tối đa 10 MB.</p>
+          <button type="submit">Tải lên và index</button>
+        </form>
+        <p id="upload-status" class="status"></p>
+      </section>
+
+      <section class="card">
+        <h2>Nạp từ URL</h2>
+        <form id="url-form" autocomplete="off">
+          <p>
+            <input id="url-input" type="url" placeholder="https://…" required size="40" />
+          </p>
+          <button type="submit">Index trang web</button>
+        </form>
+        <p id="url-status" class="status"></p>
+      </section>
+
+      <section class="card">
+        <div class="panel-head">
+          <h2>Tài liệu trong index</h2>
+          <span id="collection-count" class="muted"></span>
+        </div>
+        <div id="documents-list"></div>
+        <p id="list-status" class="status"></p>
+      </section>
+
+      <section class="card">
+        <h2>Xoá theo tên nguồn</h2>
+        <p class="muted">
+          Dùng khi nguồn không có trong danh sách trên, ví dụ trang web đã index bằng URL.
+        </p>
+        <form id="delete-form" autocomplete="off">
+          <p>
+            <input id="delete-source-input" type="text" placeholder="tên nguồn" required size="30" />
+          </p>
+          <button type="submit" class="danger-button">Xoá nguồn</button>
+        </form>
+        <p id="delete-status" class="status"></p>
+      </section>
+    </main>
+
+    <script src="/ui/admin/admin.js"></script>
+  </body>
+</html>

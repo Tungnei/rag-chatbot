@@ -65,6 +65,41 @@ def test_page_states_single_turn(client):
     assert "không nhớ" in html
 
 
+def test_admin_page_served(client):
+    response = client.get("/ui/admin/")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/html")
+    assert client.get("/ui/admin").status_code == 200
+
+
+def test_admin_page_has_required_hooks(client):
+    html = client.get("/ui/admin/").text
+    for element_id in (
+        "upload-form",
+        "file-input",
+        "collection-count",
+        "documents-list",
+        "delete-form",
+        "delete-source-input",
+    ):
+        assert f'id="{element_id}"' in html
+
+
+def test_admin_js_never_uses_innerhtml(client):
+    # Source names and uploaded filenames are user-supplied, so the same bar applies.
+    source = client.get("/ui/admin/admin.js").text
+    for banned in BANNED_JS:
+        assert banned not in source
+
+
+def test_admin_page_warns_no_auth(client):
+    # The page can wipe the index and has no authentication in front of it. Saying so
+    # is part of the P1/P3 safety contract, so it gets a test.
+    html = client.get("/ui/admin/").text
+    assert 'id="no-auth-warning"' in html
+    assert "xác thực" in html
+
+
 def test_mount_does_not_shadow_api(client):
     # Mounting at "/" instead of "/ui", or mounting before the router, would swallow
     # the whole API. This guard is green from the start by design: it fails only if a
