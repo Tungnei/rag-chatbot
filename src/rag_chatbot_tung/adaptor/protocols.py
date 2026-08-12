@@ -5,7 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
 
-from rag_chatbot_tung.validate import CollectionInfo, GenerationResult, RetrievedChunk
+from rag_chatbot_tung.validate import (
+    CollectionInfo,
+    DocumentSummary,
+    GenerationResult,
+    RetrievedChunk,
+)
 
 
 @dataclass(slots=True)
@@ -38,6 +43,8 @@ class VectorStore(Protocol):
     ) -> list[RetrievedChunk]: ...
 
     def delete_by_source(self, source: str) -> None: ...
+
+    def list_sources(self) -> list[DocumentSummary]: ...
 
     def info(self) -> CollectionInfo: ...
 

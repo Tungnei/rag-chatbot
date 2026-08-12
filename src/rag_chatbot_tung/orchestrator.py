@@ -14,6 +14,7 @@ from rag_chatbot_tung.logging import get_logger
 from rag_chatbot_tung.retrieval import IngestionPipeline, QdrantVectorStore
 from rag_chatbot_tung.validate import (
     CollectionInfo,
+    DocumentList,
     HealthResponse,
     IngestRequest,
     IngestResponse,
@@ -101,6 +102,10 @@ class RAGOrchestrator:
 
     def delete_source(self, source: str) -> None:
         self.vector_store.delete_by_source(source)
+
+    def list_documents(self) -> DocumentList:
+        documents = self.vector_store.list_sources()
+        return DocumentList(documents=documents, total=len(documents))
 
     def collection_info(self) -> CollectionInfo:
         return self.vector_store.info()

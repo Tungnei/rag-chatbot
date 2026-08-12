@@ -45,3 +45,42 @@ def test_empty_upsert_is_noop(vector_store):
 
 def test_health(vector_store):
     assert vector_store.health() is True
+
+
+def point_id(number: int) -> str:
+    return f"00000000-0000-0000-0000-{number:012d}"
+
+
+def test_list_sources_empty(vector_store):
+    assert vector_store.list_sources() == []
+
+
+def test_list_sources_groups_by_source(vector_store):
+    # 300 chunks in one source pushes past the 256-point scroll page, so the
+    # pagination branch actually runs. A single-page fixture would leave it
+    # untested and still green.
+    points = [make_point(point_id(n), 0.5, source="faq.txt", index=n) for n in range(300)]
+    points += [
+        make_point(point_id(1000 + n), 0.4, source="guide.md", index=n, title="Guide")
+        for n in range(3)
+    ]
+    vector_store.upsert(points)
+
+    documents = vector_store.list_sources()
+
+    assert [doc.source for doc in documents] == ["faq.txt", "guide.md"]
+    assert documents[0].chunks == 300
+    assert documents[1].chunks == 3
+    assert documents[1].title == "Guide"
+
+
+def test_list_sources_after_delete(vector_store):
+    vector_store.upsert(
+        [
+            make_point(point_id(1), 0.5, source="faq.txt"),
+            make_point(point_id(2), 0.4, source="guide.md"),
+        ]
+    )
+    vector_store.delete_by_source("faq.txt")
+
+    assert [doc.source for doc in vector_store.list_sources()] == ["guide.md"]

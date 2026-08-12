@@ -69,3 +69,18 @@ def test_delete_document(client, sample_txt):
     client.post("/ingest", json={"path": "faq.txt"})
     assert client.delete("/documents", params={"source": "faq.txt"}).status_code == 204
     assert client.get("/collections").json()["points_count"] == 0
+
+
+def test_get_documents(client, sample_txt, sample_md):
+    client.post("/ingest", json={"path": "faq.txt"})
+    client.post("/ingest", json={"path": "guide.md"})
+
+    body = client.get("/documents").json()
+
+    assert body["total"] == 2
+    assert [doc["source"] for doc in body["documents"]] == ["faq.txt", "guide.md"]
+    # total counts sources; points_count counts chunks. Two different numbers that
+    # must still agree with each other.
+    assert sum(doc["chunks"] for doc in body["documents"]) == (
+        client.get("/collections").json()["points_count"]
+    )

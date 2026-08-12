@@ -84,6 +84,21 @@ class IngestResponse(BaseModel):
     status: str = "ok"
 
 
+class DocumentSummary(BaseModel):
+    """One indexed source and how many chunks it currently occupies."""
+
+    source: str
+    source_type: SourceType
+    chunks: int
+    title: str | None = None
+
+
+class DocumentList(BaseModel):
+    documents: list[DocumentSummary]
+    # Number of sources, not of chunks — `CollectionInfo.points_count` is the chunk count.
+    total: int
+
+
 class CollectionInfo(BaseModel):
     name: str
     points_count: int

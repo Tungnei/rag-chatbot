@@ -7,9 +7,16 @@ from qdrant_client import QdrantClient, models
 from rag_chatbot_tung.adaptor import VectorPoint
 from rag_chatbot_tung.configs import QdrantSettings
 from rag_chatbot_tung.logging import get_logger
-from rag_chatbot_tung.validate import CollectionInfo, RetrievedChunk, SourceType
+from rag_chatbot_tung.validate import (
+    CollectionInfo,
+    DocumentSummary,
+    RetrievedChunk,
+    SourceType,
+)
 
 logger = get_logger(__name__)
+
+_SCROLL_PAGE = 256
 
 
 class QdrantVectorStore:
@@ -88,6 +95,49 @@ class QdrantVectorStore:
             ),
             wait=True,
         )
+
+    def list_sources(self) -> list[DocumentSummary]:
+        """Every indexed source with its chunk count, sorted by name.
+
+        Walks the collection page by page: Qdrant offers no distinct-value call that
+        works in both server and local mode, and this stays O(number of chunks). Fine
+        at the scale this project indexes; revisit with the facet API if it stops being.
+        """
+        summaries: dict[str, DocumentSummary] = {}
+        offset: models.ExtendedPointId | None = None
+
+        while True:
+            points, offset = self._client.scroll(
+                collection_name=self.collection,
+                limit=_SCROLL_PAGE,
+                offset=offset,
+                with_payload=["source", "source_type", "title"],
+                # Counting chunks does not need their 1536-dim vectors.
+                with_vectors=False,
+            )
+
+            for point in points:
+                payload = point.payload or {}
+                source = payload.get("source", "unknown")
+                existing = summaries.get(source)
+                if existing is None:
+                    summaries[source] = DocumentSummary(
+                        source=source,
+                        source_type=SourceType(payload.get("source_type", "text")),
+                        chunks=1,
+                        title=payload.get("title"),
+                    )
+                    continue
+                existing.chunks += 1
+                if existing.title is None:
+                    existing.title = payload.get("title")
+
+            if offset is None:
+                break
+
+        # Sorted so the result does not depend on storage order, which differs
+        # between the local client used in tests and a real Qdrant server.
+        return [summaries[source] for source in sorted(summaries)]
 
     def info(self) -> CollectionInfo:
         info = self._client.get_collection(self.collection)

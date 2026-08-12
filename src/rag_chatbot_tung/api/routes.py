@@ -14,6 +14,7 @@ from rag_chatbot_tung.orchestrator import RAGOrchestrator
 from rag_chatbot_tung.retrieval import UnsupportedFormatError
 from rag_chatbot_tung.validate import (
     CollectionInfo,
+    DocumentList,
     HealthResponse,
     IngestRequest,
     IngestResponse,
@@ -73,6 +74,11 @@ async def ingest_upload(
 @router.get("/collections", response_model=CollectionInfo)
 def collection_info(orchestrator: Orchestrator) -> CollectionInfo:
     return orchestrator.collection_info()
+
+
+@router.get("/documents", response_model=DocumentList)
+def list_documents(orchestrator: Orchestrator) -> DocumentList:
+    return orchestrator.list_documents()
 
 
 @router.delete("/documents", status_code=status.HTTP_204_NO_CONTENT)
