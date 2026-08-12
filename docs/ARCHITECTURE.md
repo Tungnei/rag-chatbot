@@ -25,6 +25,9 @@ POST /query {"question": "..."}
         QueryResponse{answer, sources, model, tokens_used, latency_ms}
 ```
 
+The browser UI at `/ui` is a static page mounted on this same app; it calls `/query`
+exactly like any other client, so nothing above changes when it is used.
+
 ## Ingestion flow
 
 ```
@@ -59,9 +62,15 @@ is duplicated and stale chunks cannot survive an edit.
 | `llm_generator/` | Chat completion wrapper + grounded prompt construction |
 | `orchestrator.py` | Composes the above into `answer` / `ingest` / `health` |
 | `api/` | FastAPI app, routes, dependency wiring, error handling |
+| `api/static/` | Browser UI served at `/ui` — plain HTML/CSS/JS, no logic, no build step |
 | `evaluate/` | Retrieval hit-rate and MRR against a golden Q&A set |
 
 ## Why the adaptor layer
+
+`VectorStore` covers `ensure_collection`, `upsert`, `search`, `delete_by_source`,
+`list_sources`, `info`, and `health`. `list_sources` walks the collection with `scroll`
+rather than a distinct-value call, so it behaves the same against a real server and the
+in-memory client the tests use.
 
 `RAGOrchestrator` depends on the three `Protocol`s in `adaptor/protocols.py`, never on
 concrete classes. Swapping OpenAI for Ollama, or Qdrant for Pinecone, means writing one

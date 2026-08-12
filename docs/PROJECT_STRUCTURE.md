@@ -27,9 +27,16 @@ rag-chatbot-tung/
 │   │   ├── text.py                     # clean_text, normalize_whitespace
 │   │   └── tokens.py                   # count_tokens, truncate_to_tokens
 │   └── api/
-│       ├── app.py                      # create_app()
+│       ├── app.py                      # create_app(), mounts /ui
 │       ├── routes.py                   # endpoints
-│       └── dependencies.py             # get_orchestrator()
+│       ├── dependencies.py             # get_orchestrator()
+│       └── static/                     # browser UI, no build step
+│           ├── index.html              # chat page (/ui)
+│           ├── styles.css              # shared by both pages
+│           ├── app.js                  # chat logic
+│           └── admin/
+│               ├── index.html          # document management (/ui/admin)
+│               └── admin.js
 ├── scripts/
 │   ├── ingest.py                       # bulk-index data/documents/
 │   └── run_eval.py                     # retrieval quality report
@@ -59,7 +66,10 @@ Defined in `validate.py` and shared by every layer:
 | `GenerationResult` | LLM output plus token usage |
 | `QueryRequest` / `QueryResponse` | `/query` contract |
 | `IngestRequest` / `IngestResponse` | `/ingest` contract |
+| `DocumentSummary` / `DocumentList` | `GET /documents`: one source and its chunk count |
 | `CollectionInfo`, `HealthResponse` | `/collections`, `/health` |
+
+`DocumentList.total` counts sources; `CollectionInfo.points_count` counts chunks.
 
 `IngestRequest` validates that exactly one of `path` or `url` is supplied — supplying
 both or neither returns HTTP 422.

@@ -18,7 +18,13 @@ curl -X POST localhost:8000/query \
      -d '{"question": "What embedding model is used by default?"}'
 ```
 
+Browser UI: <http://localhost:8000/ui> — ask questions and read the sources side by side.
+Document management: <http://localhost:8000/ui/admin>.
+
 Interactive API docs: <http://localhost:8000/docs>
+
+> Neither the UI nor the API has any authentication, and CORS is wide open. Keep this on
+> localhost. Exposing port 8000 lets anyone burn your OpenAI credit or wipe the index.
 
 ## Local development
 
@@ -38,7 +44,10 @@ uv run rag-chatbot-tung                       # start the API
 | POST | `/ingest` | Index a file under `data/documents/` or a URL |
 | POST | `/ingest/upload` | Upload and index a file directly |
 | GET | `/collections` | Number of indexed chunks |
+| GET | `/documents` | Every indexed source with its chunk count |
 | DELETE | `/documents?source=…` | Remove every chunk of one source |
+
+The browser UI is served by the same app: `/ui` for chat, `/ui/admin` for documents.
 
 Supported formats: `.txt`, `.md`, `.pdf`, plus any web page by URL.
 
@@ -52,7 +61,7 @@ Precedence: environment > `.env` > `configs/default.yaml` > built-in defaults.
 ## Development commands
 
 ```bash
-uv run pytest                    # 45 tests, no network calls
+uv run pytest                    # 60 tests, no network calls
 uv run ruff check src tests
 uv run black src tests
 uv run mypy src

@@ -86,10 +86,14 @@ curl -X POST localhost:8000/ingest/upload -F 'file=@/path/to/report.pdf'
 ## Verifying the install
 
 ```bash
-uv run pytest                          # 45 tests, no network access needed
+uv run pytest                          # 60 tests, no network access needed
 curl localhost:8000/health             # expects qdrant:true, openai:true
 curl localhost:8000/collections        # expects points_count > 0 after ingesting
+curl -sL -o /dev/null -w '%{http_code}\n' localhost:8000/ui   # expects 200
 ```
+
+`-L` is not optional on `/ui`: the static mount answers the bare path with a 307 to
+`/ui/`, so plain `curl localhost:8000/ui` prints 307 and looks broken when it is not.
 
 ## Troubleshooting
 
@@ -98,6 +102,13 @@ curl localhost:8000/collections        # expects points_count > 0 after ingestin
 
 **`/health` reports `qdrant: false`** — Qdrant is unreachable. Check `docker ps`, and note
 that inside docker compose the host is `qdrant`, not `localhost`.
+
+**`/ui` does not load at all** — this is expected when Qdrant was already down at
+startup, and it is not a UI bug. `create_app` calls `ensure_collection()` during
+lifespan, so an unreachable Qdrant stops uvicorn from starting: there is no server left
+to serve the page, and the UI cannot report the failure because it never loads. Check
+`docker compose ps` first, then `curl localhost:8000/health`. Start Qdrant and restart
+the API.
 
 **`/health` reports `openai: false`** — the API key is missing, invalid, or the configured
 model is not available to your account.

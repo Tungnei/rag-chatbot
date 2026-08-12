@@ -1,5 +1,14 @@
 # Quick Reference
 
+## Browser UI
+
+| URL | Page |
+|---|---|
+| <http://localhost:8000/ui> | Chat: question on the left, sources on the right, `[1]` jumps to a source |
+| <http://localhost:8000/ui/admin> | Upload, list indexed sources, delete a source |
+
+No authentication on either page — localhost only.
+
 ## Commands
 
 ```bash
@@ -20,6 +29,10 @@ docker compose down -v                 # stop and wipe the vector store
 ```bash
 curl localhost:8000/health
 curl localhost:8000/collections
+curl localhost:8000/documents
+
+# The UI redirects /ui to /ui/, so -L is required or curl reports 307.
+curl -sL -o /dev/null -w '%{http_code}\n' localhost:8000/ui
 
 curl -X POST localhost:8000/query -H 'Content-Type: application/json' \
      -d '{"question": "What embedding model is used?", "top_k": 5}'
