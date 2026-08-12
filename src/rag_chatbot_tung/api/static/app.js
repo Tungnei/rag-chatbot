@@ -20,7 +20,10 @@
   var topKValue = document.getElementById("top-k-value");
   var includeSources = document.getElementById("include-sources");
 
-  var sourceCards = [];
+  // Cards for whichever answer's sources the panel is currently showing. Never a
+  // record of "the latest answer": each answer owns its own source list and clicking
+  // one of its citations repaints the panel from that list.
+  var shownCards = [];
 
   function loadParams() {
     try {
@@ -64,11 +67,11 @@
     return node;
   }
 
-  function highlightSource(number) {
-    sourceCards.forEach(function (card, index) {
+  function highlight(number) {
+    shownCards.forEach(function (card, index) {
       card.classList.toggle("active", index === number - 1);
     });
-    var target = sourceCards[number - 1];
+    var target = shownCards[number - 1];
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
@@ -77,7 +80,12 @@
   // Splits on [n] with a capturing group, so odd indices are the numbers themselves.
   // A number with no matching source stays plain text: the model can cite [4] while
   // only three passages came back, and that must not throw or fake a link.
-  function appendAnswer(container, text, sourceTotal) {
+  //
+  // Each answer closes over its OWN sources. A citation in an older answer therefore
+  // repaints the panel with that answer's passages instead of indexing into whatever
+  // the most recent question happened to return.
+  function appendAnswer(container, text, sources) {
+    var sourceTotal = sources.length;
     var parts = String(text).split(/\[(\d+)\]/g);
     parts.forEach(function (part, index) {
       if (index % 2 === 0) {
@@ -93,7 +101,8 @@
         button.className = "citation";
         button.textContent = "[" + number + "]";
         button.addEventListener("click", function () {
-          highlightSource(number);
+          renderSources(sources);
+          highlight(number);
         });
         container.appendChild(button);
         return;
@@ -104,7 +113,7 @@
 
   function renderSources(sources) {
     sourcesPanel.replaceChildren();
-    sourceCards = [];
+    shownCards = [];
 
     if (!sources.length) {
       var empty = document.createElement("p");
@@ -140,7 +149,7 @@
       card.appendChild(head);
       card.appendChild(snippet);
       sourcesPanel.appendChild(card);
-      sourceCards.push(card);
+      shownCards.push(card);
     });
 
     sourcesCount.textContent = sources.length + " đoạn";
@@ -161,7 +170,7 @@
     var sources = payload.sources || [];
     var node = document.createElement("div");
     node.className = "msg msg-bot";
-    appendAnswer(node, payload.answer, sources.length);
+    appendAnswer(node, payload.answer, sources);
 
     var meta = document.createElement("div");
     meta.className = "meta";
@@ -181,7 +190,11 @@
 
   async function ask(question) {
     var skeleton = showSkeleton();
+    // The textarea has to be disabled too, not just the button: requestSubmit() on
+    // Enter submits regardless of the submit button's disabled state, which would let
+    // two /query calls overlap and land their answers out of order.
     sendButton.disabled = true;
+    input.disabled = true;
 
     try {
       var response = await fetch("/query", {
@@ -211,6 +224,7 @@
       addMessage("msg-error", "Không gọi được API: " + err.message);
     } finally {
       sendButton.disabled = false;
+      input.disabled = false;
       input.focus();
     }
   }

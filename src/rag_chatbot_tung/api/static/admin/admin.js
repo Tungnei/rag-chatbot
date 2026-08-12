@@ -26,6 +26,14 @@
   var deleteSourceInput = document.getElementById("delete-source-input");
   var deleteStatus = document.getElementById("delete-status");
 
+  // What the server said last time we asked. Every delete is checked against it, so
+  // the page never claims to have removed something that was never there.
+  var knownDocuments = [];
+  // Every refresh takes a ticket; a response holding a stale ticket is dropped. Without
+  // this, an upload's refresh landing after a delete's would repaint the pre-delete
+  // list and put back a row the user just removed.
+  var refreshTicket = 0;
+
   function setStatus(node, message, isError) {
     node.textContent = message;
     node.classList.toggle("error", Boolean(isError));
@@ -43,31 +51,61 @@
     return "Lỗi " + response.status + ": " + text;
   }
 
+  function findDocument(source) {
+    return knownDocuments.filter(function (doc) {
+      return doc.source === source;
+    })[0];
+  }
+
+  function clearListing(message) {
+    documentsList.replaceChildren();
+    collectionCount.textContent = "";
+    knownDocuments = [];
+    setStatus(listStatus, message, true);
+  }
+
   // The list and the chunk count come from two separate calls. Refreshing only one
-  // leaves the page contradicting itself, so both always move together.
+  // leaves the page contradicting itself, so both always move together — and on any
+  // failure the stale list is cleared rather than left sitting under a red error
+  // where it still looks authoritative.
   async function refresh() {
+    var ticket = (refreshTicket += 1);
+
     try {
-      var [documentsResponse, collectionResponse] = await Promise.all([
-        fetch("/documents"),
-        fetch("/collections"),
-      ]);
+      var responses = await Promise.all([fetch("/documents"), fetch("/collections")]);
+      if (ticket !== refreshTicket) {
+        return false;
+      }
+
+      var documentsResponse = responses[0];
+      var collectionResponse = responses[1];
 
       if (!documentsResponse.ok) {
-        setStatus(listStatus, await readError(documentsResponse), true);
-        return;
+        clearListing(await readError(documentsResponse));
+        return false;
       }
 
       var payload = await documentsResponse.json();
-      renderDocuments(payload.documents || []);
+      if (ticket !== refreshTicket) {
+        return false;
+      }
+
+      knownDocuments = payload.documents || [];
+      renderDocuments(knownDocuments);
 
       if (collectionResponse.ok) {
         var info = await collectionResponse.json();
         collectionCount.textContent =
           payload.total + " nguồn · " + info.points_count + " chunk";
+      } else {
+        collectionCount.textContent = payload.total + " nguồn";
       }
+
       setStatus(listStatus, "");
+      return true;
     } catch (err) {
-      setStatus(listStatus, "Không gọi được API: " + err.message, true);
+      clearListing("Không gọi được API: " + err.message);
+      return false;
     }
   }
 
@@ -95,7 +133,7 @@
       button.className = "danger-button";
       button.textContent = "Xoá";
       button.addEventListener("click", function () {
-        removeSource(doc.source, doc.chunks);
+        removeSource(doc.source);
       });
 
       row.appendChild(label);
@@ -104,12 +142,27 @@
     });
   }
 
-  // Deleting a source drops every chunk of it and cannot be undone, and the button
-  // sits right next to the row — so the name and the cost are spelled out first.
-  async function removeSource(source, chunks) {
-    var detail = chunks === undefined ? "" : " (" + chunks + " chunk)";
+  // DELETE /documents is a filter delete: it answers 204 whether or not anything
+  // matched. So a name is checked against the listing first, and the result is checked
+  // against the listing afterwards — otherwise a typo produces a cheerful "deleted"
+  // and the user concludes the list is stale rather than that they mistyped.
+  async function removeSource(source) {
+    var known = findDocument(source);
+    if (!known) {
+      setStatus(
+        deleteStatus,
+        "Không có nguồn tên “" + source + "” trong index. Kiểm tra lại danh sách phía trên.",
+        true
+      );
+      return;
+    }
+
     var confirmed = window.confirm(
-      "Xoá toàn bộ chunk của nguồn “" + source + "”" + detail + "?\nKhông hoàn tác được."
+      "Xoá toàn bộ " +
+        known.chunks +
+        " chunk của nguồn “" +
+        source +
+        "”?\nKhông hoàn tác được."
     );
     if (!confirmed) {
       return;
@@ -124,8 +177,17 @@
         setStatus(deleteStatus, await readError(response), true);
         return;
       }
+
+      var refreshed = await refresh();
+      if (!refreshed) {
+        setStatus(deleteStatus, "Đã gửi lệnh xoá nhưng không đọc lại được danh sách.", true);
+        return;
+      }
+      if (findDocument(source)) {
+        setStatus(deleteStatus, "Nguồn “" + source + "” vẫn còn trong index.", true);
+        return;
+      }
       setStatus(deleteStatus, "Đã xoá nguồn " + source + ".");
-      await refresh();
     } catch (err) {
       setStatus(deleteStatus, "Không gọi được API: " + err.message, true);
     }
@@ -160,7 +222,11 @@
       // Re-uploading a name replaces it: the pipeline drops the old chunks first.
       setStatus(
         uploadStatus,
-        "Đã index " + result.source + ": " + result.chunks_indexed + " chunk (ghi đè nếu trùng tên)."
+        "Đã index " +
+          result.source +
+          ": " +
+          result.chunks_indexed +
+          " chunk (ghi đè nếu trùng tên)."
       );
       uploadForm.reset();
       await refresh();
@@ -190,7 +256,10 @@
         return;
       }
       var result = await response.json();
-      setStatus(urlStatus, "Đã index " + result.source + ": " + result.chunks_indexed + " chunk.");
+      setStatus(
+        urlStatus,
+        "Đã index " + result.source + ": " + result.chunks_indexed + " chunk."
+      );
       urlForm.reset();
       await refresh();
     } catch (err) {
@@ -205,7 +274,7 @@
       return;
     }
     deleteForm.reset();
-    removeSource(source, undefined);
+    removeSource(source);
   });
 
   refresh();

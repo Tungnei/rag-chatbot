@@ -74,6 +74,40 @@ def test_list_sources_groups_by_source(vector_store):
     assert documents[1].title == "Guide"
 
 
+def test_list_sources_survives_unknown_source_type(vector_store):
+    # One hand-written or future-version point must not 500 the whole endpoint.
+    vector_store.upsert([make_point(point_id(1), 0.5, source_type="html")])
+    documents = vector_store.list_sources()
+    assert documents[0].source_type is SourceType.TEXT
+    assert documents[0].chunks == 1
+
+
+def test_list_sources_skips_points_without_source(vector_store):
+    # A source-less point is unreachable by delete_by_source, so listing it would only
+    # offer a delete button that silently does nothing.
+    vector_store.upsert(
+        [
+            make_point(point_id(1), 0.5, source="faq.txt"),
+            make_point(point_id(2), 0.4, source=None),
+        ]
+    )
+    assert [doc.source for doc in vector_store.list_sources()] == ["faq.txt"]
+
+
+def test_list_sources_title_comes_from_the_first_chunk(vector_store):
+    # Markdown gives each chunk its enclosing heading, and point ids are uuid5 of
+    # "source:index", so id order says nothing about chunk order. Only index 0 holds
+    # anything that can be called the document's title.
+    vector_store.upsert(
+        [
+            make_point(point_id(7), 0.5, source="guide.md", index=1, title="Usage"),
+            make_point(point_id(3), 0.5, source="guide.md", index=0, title="Guide"),
+            make_point(point_id(9), 0.5, source="guide.md", index=2, title="Setup"),
+        ]
+    )
+    assert vector_store.list_sources()[0].title == "Guide"
+
+
 def test_list_sources_after_delete(vector_store):
     vector_store.upsert(
         [

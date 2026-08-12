@@ -19,6 +19,22 @@ logger = get_logger(__name__)
 _SCROLL_PAGE = 256
 
 
+def _coerce_source_type(value: object) -> SourceType:
+    """Never let one odd payload take down a whole-collection sweep.
+
+    `SourceType(...)` raises on an unknown value or an explicit null, which in
+    `list_sources` would turn a single hand-written or future-version point into a
+    500 for the entire endpoint.
+    """
+    if isinstance(value, str):
+        try:
+            return SourceType(value)
+        except ValueError:
+            pass
+    logger.warning("unusable source_type %r in payload, treating as text", value)
+    return SourceType.TEXT
+
+
 class QdrantVectorStore:
     def __init__(self, settings: QdrantSettings, client: QdrantClient | None = None) -> None:
         self._settings = settings
@@ -111,25 +127,35 @@ class QdrantVectorStore:
                 collection_name=self.collection,
                 limit=_SCROLL_PAGE,
                 offset=offset,
-                with_payload=["source", "source_type", "title"],
+                with_payload=["source", "source_type", "title", "index"],
                 # Counting chunks does not need their 1536-dim vectors.
                 with_vectors=False,
             )
 
             for point in points:
                 payload = point.payload or {}
-                source = payload.get("source", "unknown")
+                source = payload.get("source")
+                if not source:
+                    # No source means delete_by_source can never reach it, so listing it
+                    # would only offer the user a delete button that does nothing.
+                    logger.warning("skipping point %s: payload has no source", point.id)
+                    continue
+
                 existing = summaries.get(source)
                 if existing is None:
-                    summaries[source] = DocumentSummary(
+                    existing = DocumentSummary(
                         source=source,
-                        source_type=SourceType(payload.get("source_type", "text")),
-                        chunks=1,
-                        title=payload.get("title"),
+                        source_type=_coerce_source_type(payload.get("source_type")),
+                        chunks=0,
                     )
-                    continue
+                    summaries[source] = existing
+
                 existing.chunks += 1
-                if existing.title is None:
+                # Markdown gives every chunk the heading it sits under, so only the
+                # first chunk carries anything resembling a document title. Picking
+                # whichever chunk arrived first would surface a random mid-document
+                # section instead.
+                if payload.get("index") == 0:
                     existing.title = payload.get("title")
 
             if offset is None:
