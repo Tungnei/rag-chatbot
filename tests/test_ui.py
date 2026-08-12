@@ -27,6 +27,44 @@ def test_ui_bare_path_redirects_to_index(client):
     assert client.get("/ui").status_code == 200
 
 
+BANNED_JS = ("innerHTML", "outerHTML", "insertAdjacentHTML", "document.write", "eval(")
+
+
+def test_chat_page_has_required_hooks(client):
+    html = client.get("/ui/").text
+    for element_id in (
+        "chat-form",
+        "question-input",
+        "messages",
+        "sources-panel",
+        "top-k",
+        "include-sources",
+    ):
+        assert f'id="{element_id}"' in html
+
+
+def test_static_assets_served(client):
+    for path in ("/ui/app.js", "/ui/styles.css"):
+        assert client.get(path).status_code == 200
+
+
+def test_app_js_never_uses_innerhtml(client):
+    # Answers and snippets come from indexed documents, so they are untrusted text.
+    # This bars the common injection route; it is a barrier, not a proof — the
+    # textContent discipline still has to be kept by hand.
+    source = client.get("/ui/app.js").text
+    for banned in BANNED_JS:
+        assert banned not in source
+
+
+def test_page_states_single_turn(client):
+    # The transcript looks like a chat, but the backend gets no history. Saying so is
+    # part of the contract with the user, so it gets a test rather than good intentions.
+    html = client.get("/ui/").text
+    assert 'id="single-turn-notice"' in html
+    assert "không nhớ" in html
+
+
 def test_mount_does_not_shadow_api(client):
     # Mounting at "/" instead of "/ui", or mounting before the router, would swallow
     # the whole API. This guard is green from the start by design: it fails only if a
