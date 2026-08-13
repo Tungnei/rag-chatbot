@@ -13,12 +13,15 @@ services:
     depends_on:
       - qdrant
     ports:
-      - "8000:8000"
+      - "8001:8000"
     env_file:
       - .env
     environment:
       QDRANT__URL: http://qdrant:6333
       API__HOST: 0.0.0.0
+      # Stays 8000 inside the container: the published port maps 8001 -> 8000, and the
+      # Dockerfile healthcheck probes localhost:8000 from within. Change the host side
+      # in `ports` to move the port you browse to.
       API__PORT: "8000"
     volumes:
       - ./data/documents:/app/data/documents

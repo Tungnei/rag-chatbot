@@ -43,8 +43,8 @@
     },
     {
       "name": "container-smoke",
-      "status": "SKIP",
-      "detail": "CHƯA CHẠY: docker daemon thiếu root CA Vingroup, cần sudo mà sudo đòi mật khẩu. Thiếu cả .env."
+      "status": "PASS",
+      "detail": "ĐÃ CHẠY THẬT trong container (docker compose, cổng host 8001 -> 8000): /ui 200, /ui/admin 200, /ui/app.js 200, /ui/admin/admin.js 200, /docs 200, /ui không -L trả 307 đúng như tài liệu. health {qdrant:true, openai:false}, collections points_count 0, documents total 0. Container báo (healthy)."
     },
     {
       "name": "manual-acceptance",
@@ -55,6 +55,8 @@
   "verdict": "PASS",
   "notes": [
     "PASS này chỉ phủ phần đo được bằng máy. Hai hạng mục SKIP là bằng chứng còn nợ, không phải đã bỏ.",
-    "Plan chưa được đóng (close_plan.py) vì acceptance toàn plan còn hai dòng chưa tick: smoke container và nghiệm thu thủ công."
+    "Plan chưa được đóng (close_plan.py) vì acceptance toàn plan còn hai dòng chưa tick: smoke container và nghiệm thu thủ công.",
+    "Cập nhật 2026-08-13: smoke container đã chạy và đạt, R3 khép lại hoàn toàn. Trên đường tới đó phát hiện và sửa một lỗi cấu hình trong docker-compose.yaml: ports 8001:8000 nhưng API__PORT lại đặt 8001, nên không có gì nghe ở cổng 8000 trong container và HEALTHCHECK của Dockerfile (localhost:8000) cũng hỏng theo.",
+    "Còn nợ duy nhất: nghiệm thu thủ công trên trình duyệt (phase 3 và 5) — cần OPENAI_API_KEY thật."
   ]
 }
