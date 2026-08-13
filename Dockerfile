@@ -6,9 +6,17 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 WORKDIR /app
 
+# Dependencies first, without the project itself. This layer is keyed on the lockfile
+# alone, so editing src/ no longer reinstalls every dependency — copying the source
+# before this step made a one-character change cost a full reinstall.
 COPY pyproject.toml uv.lock README.md ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --no-install-project
+
+# Then the project itself, which is the only thing a source edit has to redo.
 COPY src ./src
-RUN uv sync --frozen --no-dev
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
 
 
 FROM python:3.11-slim-bookworm AS runtime
