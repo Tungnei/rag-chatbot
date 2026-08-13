@@ -8,9 +8,9 @@ from pathlib import Path
 from rag_chatbot_tung.adaptor import EmbeddingProvider, LLMProvider, VectorStore
 from rag_chatbot_tung.chunking import TextSplitter
 from rag_chatbot_tung.configs import Settings
-from rag_chatbot_tung.embeddings import OpenAIEmbedder
-from rag_chatbot_tung.llm_generator import NO_CONTEXT_ANSWER, OpenAILLM, build_rag_messages
+from rag_chatbot_tung.llm_generator import NO_CONTEXT_ANSWER, build_rag_messages
 from rag_chatbot_tung.logging import get_logger
+from rag_chatbot_tung.providers import build_embedder, build_llm
 from rag_chatbot_tung.retrieval import IngestionPipeline, QdrantVectorStore
 from rag_chatbot_tung.validate import (
     CollectionInfo,
@@ -38,9 +38,9 @@ class RAGOrchestrator:
         llm: LLMProvider | None = None,
     ) -> None:
         self.settings = settings
-        self.embedder = embedder or OpenAIEmbedder(settings.embeddings, settings.openai_api_key)
+        self.embedder = embedder or build_embedder(settings)
         self.vector_store = vector_store or QdrantVectorStore(settings.qdrant)
-        self.llm = llm or OpenAILLM(settings.llm, settings.openai_api_key)
+        self.llm = llm or build_llm(settings)
         self.pipeline = IngestionPipeline(
             self.embedder, self.vector_store, TextSplitter(settings.chunking)
         )

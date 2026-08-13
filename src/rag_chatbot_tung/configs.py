@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, Field
 from pydantic_settings import (
@@ -26,17 +27,28 @@ class QdrantSettings(BaseModel):
 
 
 class EmbeddingSettings(BaseModel):
+    # Anthropic serves no embeddings API, so this half of the pipeline is configured
+    # independently of the LLM and cannot follow it to every provider.
+    provider: Literal["openai"] = "openai"
     model: str = "text-embedding-3-small"
     batch_size: int = 100
     max_retries: int = 3
 
 
 class LLMSettings(BaseModel):
+    provider: Literal["openai", "anthropic"] = "openai"
     model: str = "gpt-4o-mini"
+    # OpenAI only. Current Claude models reject temperature with a 400, so the
+    # Anthropic adapter never sends it — use `effort` there instead.
     temperature: float = 0.7
+    # On Claude models that think, this caps thinking *and* answer together — leave
+    # room or the answer gets cut off mid-sentence.
     max_tokens: int = 2000
     timeout: int = 60
     context_token_budget: int = 6000
+    # Anthropic only, and not accepted by every model (Sonnet 4.5 errors on it), so it
+    # is sent only when set.
+    effort: Literal["low", "medium", "high", "xhigh", "max"] | None = None
 
 
 class RetrieverSettings(BaseModel):
@@ -71,6 +83,7 @@ class Settings(BaseSettings):
     )
 
     openai_api_key: str = ""
+    anthropic_api_key: str = ""
     log_level: str = "INFO"
 
     qdrant: QdrantSettings = Field(default_factory=QdrantSettings)

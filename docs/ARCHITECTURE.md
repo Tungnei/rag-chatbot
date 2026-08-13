@@ -59,7 +59,8 @@ is duplicated and stale chunks cannot survive an edit.
 | `chunking/` | Boundary-aware text splitting, markdown heading awareness |
 | `embeddings/` | OpenAI embeddings with batching and rate-limit retry |
 | `retrieval/` | Qdrant wrapper + document loaders + ingestion pipeline |
-| `llm_generator/` | Chat completion wrapper + grounded prompt construction |
+| `llm_generator/` | Chat completion wrappers (OpenAI, Anthropic) + grounded prompt construction |
+| `providers.py` | Maps the `provider` settings onto concrete classes; the only place that knows which API key each provider needs |
 | `orchestrator.py` | Composes the above into `answer` / `ingest` / `health` |
 | `api/` | FastAPI app, routes, dependency wiring, error handling |
 | `api/static/` | Browser UI served at `/ui` — plain HTML/CSS/JS, no logic, no build step |
@@ -74,7 +75,14 @@ in-memory client the tests use.
 
 `RAGOrchestrator` depends on the three `Protocol`s in `adaptor/protocols.py`, never on
 concrete classes. Swapping OpenAI for Ollama, or Qdrant for Pinecone, means writing one
-new class — the orchestrator, API, and tests stay untouched. The test suite relies on
+new class — the orchestrator, API, and tests stay untouched. `providers.py` turns that
+into a runtime choice: `LLM__PROVIDER=anthropic` selects `AnthropicLLM` with no code
+change.
+
+The LLM and the embedder are chosen by **separate** settings on purpose. Anthropic serves
+no embeddings API, so the two halves cannot move together; and the embedding model
+determines the vector dimensions already written to Qdrant, so changing it silently
+alongside the LLM would corrupt an existing collection. The test suite relies on
 this: `tests/conftest.py` injects a hash-based `FakeEmbedder` and a `FakeLLM`, so the
 whole suite runs offline.
 

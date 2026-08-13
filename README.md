@@ -56,6 +56,26 @@ Supported formats: `.txt`, `.md`, `.pdf`, plus any web page by URL.
 `configs/default.yaml` holds the defaults; environment variables in `.env` override them.
 Nested settings use a double underscore, e.g. `RETRIEVER__TOP_K=5`.
 
+### Choosing an LLM provider
+
+```bash
+LLM__PROVIDER=anthropic
+LLM__MODEL=claude-opus-5
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+That is the whole switch — the orchestrator depends on the `LLMProvider` protocol, so no
+code changes. Two things do not move with it:
+
+- **Embeddings stay on OpenAI.** Anthropic has no embeddings API, so `OPENAI_API_KEY` is
+  required whichever LLM you pick. This is deliberate: the embedder and the LLM are
+  configured separately, because changing the embedding model invalidates every vector
+  already stored.
+- **`LLM__TEMPERATURE` is ignored on Anthropic.** Current Claude models reject
+  `temperature` with a 400; use `LLM__EFFORT` (`low`…`max`) instead, where the model
+  supports it. Also give `LLM__MAX_TOKENS` more headroom — on Claude it covers the
+  model's thinking as well as the answer.
+
 Precedence: environment > `.env` > `configs/default.yaml` > built-in defaults.
 
 ## Development commands

@@ -7,16 +7,20 @@ qdrant:
   distance: Cosine
 
 embeddings:
+  # openai only — Anthropic serves no embeddings API
+  provider: openai
   model: text-embedding-3-small
   batch_size: 100
   max_retries: 3
 
 llm:
+  provider: openai        # openai | anthropic
   model: gpt-4o-mini
-  temperature: 0.7
+  temperature: 0.7        # openai only; Claude models reject it
   max_tokens: 2000
   timeout: 60
   context_token_budget: 6000
+  # effort: low          # anthropic only, and not accepted by every Claude model
 
 retriever:
   top_k: 3
