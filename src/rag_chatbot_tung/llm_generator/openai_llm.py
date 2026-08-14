@@ -34,8 +34,12 @@ class OpenAILLM:
         )
 
     def health(self) -> bool:
+        # Lists rather than retrieves: gateways that speak this protocol commonly serve
+        # GET /v1/models but not GET /v1/models/{id} — and a model id containing a slash
+        # ("openai/gpt-4o-mini") does not even form a valid single-model path. A 404 here
+        # would report the whole LLM as down while generation works fine.
         try:
-            self._client.models.retrieve(self._settings.model)
+            self._client.models.list()
         except Exception as exc:
             logger.warning("llm health check failed: %s", exc)
             return False

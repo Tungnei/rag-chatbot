@@ -77,3 +77,16 @@ affects: "src/rag_chatbot_tung/configs.py,src/rag_chatbot_tung/llm_generator/ant
 ## DEC-6 — Them LLM__BASE_URL / EMBEDDINGS__BASE_URL de tro toi gateway cung giao thuc
 
 Khoa cua nguoi dung di qua cliproxy (cli-proxy-api, cong 8317) chu khong phai api.anthropic.com — da xac minh: api.anthropic.com tra 401 invalid x-api-key, con proxy tra 200 tren POST /v1/messages. base_url rong = endpoint goc cua provider. Giao thuc van phai khop provider: LLM__PROVIDER=anthropic + base_url tro toi cong noi Messages API. Sua kem mot bug that: health() cu goi models.retrieve() (GET /v1/models/{id}) ma proxy tra 404, nen /health se bao openai:false du sinh cau tra loi van chay; doi sang models.list() (GET /v1/models) chay ca hai phia. Da do: cliproxy phuc vu 15 model Claude, KHONG co model embedding, /v1/embeddings tra 404 — nen gateway Claude khong lam OPENAI_API_KEY tro nen tuy chon.
+
+---
+id: DEC-7
+status: active
+date: 2026-08-14
+actor: "user:v.tungnt200@vinsmartfuture.tech"
+ts: "2026-08-14T10:29:14.097315+00:00"
+affects: ".env.example,README.md"
+---
+
+## DEC-7 — OpenRouter phuc vu ca chat lan embeddings; ca hai nua chay qua mot khoa duy nhat
+
+Do truc tiep: POST https://openrouter.ai/api/v1/embeddings voi model 'openai/text-embedding-3-small' tra vector 1536 chieu, dung bang QDRANT__VECTOR_SIZE nen KHONG phai index lai. Chat 'openai/gpt-4o-mini' cung chay (OpenRouter dinh tuyen qua Azure). Vi OpenRouter noi giao thuc OpenAI nen cau hinh dung la LLM__PROVIDER=openai + LLM__BASE_URL + EMBEDDINGS__BASE_URL, khong can adapter moi. Dieu nay KHONG lat DEC-5: Anthropic van khong co embeddings; diem khac la gateway nao dung sau. Bai hoc ghi lai de khoi suy dien: kha nang cua mot gateway phai DO chu khong suy ra tu viec no la gateway.
