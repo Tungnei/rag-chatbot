@@ -64,3 +64,16 @@ affects: "src/rag_chatbot_tung/providers.py,src/rag_chatbot_tung/configs.py,src/
 ## DEC-5 — Chon LLM provider bang env; embeddings vinh vien tach rieng va o lai OpenAI
 
 LLM__PROVIDER chon giua openai va anthropic qua Literal trong LLMSettings, providers.py anh xa sang lop cu the. Orchestrator chi phu thuoc Protocol nen khong doi dong nao. EMBEDDINGS__PROVIDER la mot setting RIENG va hien chi nhan 'openai': Anthropic khong co API embeddings (Messages/Batches/Files/TokenCounting/Models, khong co endpoint nao cho embeddings, danh muc model khong co model embedding). Tach rieng con vi ly do thu hai: model embedding quyet dinh so chieu vector da ghi vao Qdrant, doi kem theo LLM se pha collection dang co. AnthropicLLM KHONG gui temperature (Claude doi moi tra 400) va chi gui output_config.effort khi duoc dat (Sonnet 4.5 loi neu nhan). max_tokens tren Claude bao trum ca thinking lan cau tra loi nen can headroom lon hon. Them dependency anthropic>=0.40 (da cai 0.121).
+
+---
+id: DEC-6
+status: active
+date: 2026-08-14
+actor: "user:v.tungnt200@vinsmartfuture.tech"
+ts: "2026-08-14T07:13:01.303595+00:00"
+affects: "src/rag_chatbot_tung/configs.py,src/rag_chatbot_tung/llm_generator/anthropic_llm.py,src/rag_chatbot_tung/llm_generator/openai_llm.py,src/rag_chatbot_tung/embeddings/openai_embedder.py,.env.example"
+---
+
+## DEC-6 — Them LLM__BASE_URL / EMBEDDINGS__BASE_URL de tro toi gateway cung giao thuc
+
+Khoa cua nguoi dung di qua cliproxy (cli-proxy-api, cong 8317) chu khong phai api.anthropic.com — da xac minh: api.anthropic.com tra 401 invalid x-api-key, con proxy tra 200 tren POST /v1/messages. base_url rong = endpoint goc cua provider. Giao thuc van phai khop provider: LLM__PROVIDER=anthropic + base_url tro toi cong noi Messages API. Sua kem mot bug that: health() cu goi models.retrieve() (GET /v1/models/{id}) ma proxy tra 404, nen /health se bao openai:false du sinh cau tra loi van chay; doi sang models.list() (GET /v1/models) chay ca hai phia. Da do: cliproxy phuc vu 15 model Claude, KHONG co model embedding, /v1/embeddings tra 404 — nen gateway Claude khong lam OPENAI_API_KEY tro nen tuy chon.

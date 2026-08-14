@@ -31,6 +31,8 @@ class EmbeddingSettings(BaseModel):
     # independently of the LLM and cannot follow it to every provider.
     provider: Literal["openai"] = "openai"
     model: str = "text-embedding-3-small"
+    # Empty means the provider's own endpoint; set it to route through a gateway.
+    base_url: str = ""
     batch_size: int = 100
     max_retries: int = 3
 
@@ -38,6 +40,9 @@ class EmbeddingSettings(BaseModel):
 class LLMSettings(BaseModel):
     provider: Literal["openai", "anthropic"] = "openai"
     model: str = "gpt-4o-mini"
+    # Empty means the provider's own endpoint. Point it at a gateway that speaks the
+    # selected provider's protocol (e.g. a local proxy serving the Messages API).
+    base_url: str = ""
     # OpenAI only. Current Claude models reject temperature with a 400, so the
     # Anthropic adapter never sends it — use `effort` there instead.
     temperature: float = 0.7

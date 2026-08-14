@@ -64,11 +64,21 @@ LLM__MODEL=claude-opus-5
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
+To reach a gateway instead of the provider's own endpoint, add `LLM__BASE_URL` — the
+protocol still has to match the provider you selected:
+
+```bash
+LLM__PROVIDER=anthropic
+LLM__BASE_URL=http://localhost:8317   # a proxy serving the Messages API
+LLM__MODEL=claude-opus-5
+```
+
 That is the whole switch — the orchestrator depends on the `LLMProvider` protocol, so no
 code changes. Two things do not move with it:
 
 - **Embeddings stay on OpenAI.** Anthropic has no embeddings API, so `OPENAI_API_KEY` is
-  required whichever LLM you pick. This is deliberate: the embedder and the LLM are
+  required whichever LLM you pick — and a Claude gateway does not change that, since
+  those typically serve chat only. This is deliberate: the embedder and the LLM are
   configured separately, because changing the embedding model invalidates every vector
   already stored.
 - **`LLM__TEMPERATURE` is ignored on Anthropic.** Current Claude models reject

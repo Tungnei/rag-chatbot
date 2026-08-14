@@ -14,7 +14,9 @@ logger = get_logger(__name__)
 class OpenAILLM:
     def __init__(self, settings: LLMSettings, api_key: str) -> None:
         self._settings = settings
-        self._client = OpenAI(api_key=api_key, timeout=settings.timeout)
+        self._client = OpenAI(
+            api_key=api_key, timeout=settings.timeout, base_url=settings.base_url or None
+        )
 
     def generate(self, messages: list[dict[str, str]]) -> GenerationResult:
         response = self._client.chat.completions.create(

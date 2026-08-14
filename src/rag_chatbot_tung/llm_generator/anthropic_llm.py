@@ -20,7 +20,13 @@ class AnthropicLLM:
         self, settings: LLMSettings, api_key: str, client: Anthropic | None = None
     ) -> None:
         self._settings = settings
-        self._client = client or Anthropic(api_key=api_key, timeout=settings.timeout)
+        self._client = client or Anthropic(
+            api_key=api_key,
+            timeout=settings.timeout,
+            # None keeps the SDK default (api.anthropic.com); set it to reach a
+            # gateway that speaks the Messages API.
+            base_url=settings.base_url or None,
+        )
 
     def generate(self, messages: list[dict[str, str]]) -> GenerationResult:
         system, turns = self._split_system(messages)
@@ -68,8 +74,11 @@ class AnthropicLLM:
         return system, turns
 
     def health(self) -> bool:
+        # Lists rather than retrieves: gateways that implement the Messages API often
+        # serve GET /v1/models but not GET /v1/models/{id}, and a 404 there would report
+        # the whole LLM as down while generation works fine.
         try:
-            self._client.models.retrieve(self._settings.model)
+            self._client.models.list()
         except Exception as exc:
             logger.warning("llm health check failed: %s", exc)
             return False

@@ -86,6 +86,32 @@ def test_usage_maps_onto_the_shared_result(messages):
     assert result.total_tokens == 150
 
 
+def test_base_url_routes_to_a_gateway():
+    llm = AnthropicLLM(LLMSettings(base_url="http://localhost:8317"), "key")
+    assert str(llm._client.base_url).startswith("http://localhost:8317")
+
+
+def test_health_lists_models_rather_than_retrieving_one():
+    # Gateways that speak the Messages API commonly serve GET /v1/models but 404 on
+    # GET /v1/models/{id}; retrieving would report a working LLM as down.
+    class FakeModels:
+        def __init__(self) -> None:
+            self.listed = False
+
+        def list(self):
+            self.listed = True
+            return SimpleNamespace(data=[])
+
+        def retrieve(self, _model):  # pragma: no cover - must never be called
+            raise AssertionError("health must not retrieve a single model")
+
+    client = FakeAnthropic(make_response())
+    client.models = FakeModels()
+
+    assert AnthropicLLM(LLMSettings(), "key", client=client).health() is True
+    assert client.models.listed
+
+
 def test_refusal_is_reported_instead_of_an_empty_answer(messages):
     # A declined request returns HTTP 200 with an empty content list; reading content[0]
     # would raise, and returning "" would look like a successful blank answer.

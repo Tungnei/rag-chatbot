@@ -1,21 +1,11 @@
 from __future__ import annotations
 
-import pytest
 import yaml
 
 from rag_chatbot_tung.configs import Settings, get_settings
 
-
-@pytest.fixture(autouse=True)
-def away_from_dotenv(tmp_path, monkeypatch):
-    """Run these tests somewhere without a .env file.
-
-    `Settings` resolves `env_file=".env"` against the working directory, and .env
-    outranks the YAML layer. Run from the repo root by anyone who followed the README
-    and copied .env.example, and these tests read that developer's settings instead of
-    the ones under test — a suite that goes red on a correct machine.
-    """
-    monkeypatch.chdir(tmp_path)
+# Isolation from a developer's .env is suite-wide — see the away_from_dotenv fixture
+# in conftest.py.
 
 
 def test_defaults_are_qdrant_based():

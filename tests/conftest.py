@@ -53,6 +53,19 @@ class FakeLLM:
         return True
 
 
+@pytest.fixture(autouse=True)
+def away_from_dotenv(tmp_path, monkeypatch):
+    """Run every test somewhere without a .env file.
+
+    `Settings` resolves `env_file=".env"` against the working directory, and .env
+    outranks both the YAML layer and the field defaults. Run from the repo root by
+    anyone who followed the README and copied .env.example, and the suite reads that
+    developer's settings instead of the ones under test — the suite goes red on a
+    correct machine, and which tests fail depends on what happens to be in their .env.
+    """
+    monkeypatch.chdir(tmp_path)
+
+
 @pytest.fixture
 def settings(tmp_path) -> Settings:
     s = Settings(openai_api_key="test-key")

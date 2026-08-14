@@ -21,7 +21,7 @@ _MODEL_DIMENSIONS = {
 class OpenAIEmbedder:
     def __init__(self, settings: EmbeddingSettings, api_key: str) -> None:
         self._settings = settings
-        self._client = OpenAI(api_key=api_key)
+        self._client = OpenAI(api_key=api_key, base_url=settings.base_url or None)
 
     @property
     def dimension(self) -> int:
