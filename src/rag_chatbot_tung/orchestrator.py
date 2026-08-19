@@ -12,6 +12,7 @@ from rag_chatbot_tung.llm_generator import NO_CONTEXT_ANSWER, build_rag_messages
 from rag_chatbot_tung.logging import get_logger
 from rag_chatbot_tung.providers import build_embedder, build_llm, build_reranker
 from rag_chatbot_tung.retrieval import IngestionPipeline, QdrantVectorStore
+from rag_chatbot_tung.retrieval.metadata_adjust import adjust as adjust_metadata
 from rag_chatbot_tung.validate import (
     CollectionInfo,
     DocumentList,
@@ -87,7 +88,11 @@ class RAGOrchestrator:
         # After the empty check, never before: running a model to hand back an empty
         # list wastes time and weakens the empty-result guard.
         chunks = self.reranker.rerank(question, chunks, self._effective_top_n(top_k))
-        return chunks[:top_k]
+
+        # Replaces the final cut rather than sitting beside it — when the adjustment
+        # rules are disabled this still trims to top_k, so turning the layer off cannot
+        # accidentally hand the LLM rerank.top_n chunks instead.
+        return adjust_metadata(question, chunks, self.settings.metadata_adjust, top_k)
 
     def answer(self, request: QueryRequest) -> QueryResponse:
         started = time.perf_counter()

@@ -1,7 +1,7 @@
 ---
 id: 260817-1100-p2-multiturn-hybrid
 title: "P2 — Hội thoại nhiều lượt, rồi hybrid retrieval có rerank"
-status: in_progress
+status: completed
 mode: hard
 tdd: true
 branch: feat/ui-chat-static

@@ -14,7 +14,7 @@ uv run mypy src                # type check
 uv run pytest -q               # test
 ```
 
-Cả bốn phải sạch. Baseline hiện tại: `pytest -q` → **112 passed**. Python 3.11
+Cả bốn phải sạch. Baseline hiện tại: `pytest -q` → **156 passed**. Python 3.11
 (`.python-version`, `requires-python = ">=3.11"`).
 
 ## Quy ước ngôn ngữ

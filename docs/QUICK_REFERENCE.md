@@ -103,3 +103,48 @@ Measure changes instead of guessing: add cases to `data/eval/qa.jsonl`, then com
 `tests/conftest.py` provides `FakeEmbedder` (SHA-256-derived vectors) and `FakeLLM`, plus
 an in-memory Qdrant via `QdrantClient(":memory:")`. Inject them through the
 `RAGOrchestrator` constructor — no test touches the network.
+
+## Retrieval layers and their switches
+
+Three layers ship behind switches so turning one on or off is one variable, not a
+revert. DEC-10 records the measured defaults — read it before flipping any of them.
+
+```bash
+RETRIEVER__HYBRID=true            # dense + BM25 with RRF fusion (ON by default)
+RERANK__PROVIDER=cross_encoder    # needs `uv sync --extra rerank` (OFF: noop)
+METADATA_ADJUST__ENABLED=true     # per-source cap, merge, title boost (OFF)
+```
+
+The chain of limits, in the order a query passes them:
+
+| Setting | Default | Controls |
+|---|---|---|
+| `retriever.dense_prefetch_limit` | 30 | candidates from the dense branch |
+| `retriever.sparse_prefetch_limit` | 30 | candidates from the BM25 branch |
+| `retriever.fusion_limit` | 30 | survivors of fusion, handed to the reranker |
+| `rerank.top_n` | 10 | survivors of reranking |
+| `retriever.top_k` | 5 | passages the LLM finally receives |
+
+## Measuring a change
+
+```bash
+# One configuration, written out so runs can be compared case by case.
+uv run python scripts/run_eval.py --top-k 5 --out data/eval/mine.json
+
+# Same thing against a previous run: prints which cases flipped, not just the totals.
+uv run python scripts/run_eval.py --top-k 5 --baseline data/eval/mine.json
+
+# The multi-turn A/B: same cases, pronoun phrasing vs self-contained.
+uv run python scripts/run_eval.py --cases data/eval/qa_multiturn.jsonl --selfcontained
+```
+
+Always pass `--top-k` explicitly when comparing runs. Hit-rate@5 is at least
+hit-rate@3 by definition, so a forgotten flag reads as an improvement that no layer
+produced.
+
+## Upgrading an existing collection
+
+```bash
+uv run python scripts/migrate_collection.py            # dry run, changes nothing
+uv run python scripts/migrate_collection.py --yes      # rebuild with the hybrid schema
+```

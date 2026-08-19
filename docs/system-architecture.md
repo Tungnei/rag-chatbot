@@ -13,8 +13,9 @@ là vector store, OpenAI là embeddings, LLM là OpenAI hoặc Anthropic tuỳ c
 
 ## Nguyên tắc bất biến — tầng adaptor
 
-`adaptor/protocols.py` định nghĩa ba `typing.Protocol` (`@runtime_checkable`):
-`EmbeddingProvider`, `VectorStore`, `LLMProvider`, cộng `VectorPoint` (`@dataclass(slots=True)`).
+`adaptor/protocols.py` định nghĩa bốn `typing.Protocol` (`@runtime_checkable`):
+`EmbeddingProvider`, `VectorStore`, `LLMProvider`, `Reranker`, cộng `VectorPoint` và
+`SparseVector` (`@dataclass(slots=True)`).
 
 `RAGOrchestrator.__init__` (`orchestrator.py:33-46`) nhận ba phụ thuộc này qua constructor
 injection dưới dạng Protocol. Class cụ thể mà nó import chỉ là hạ tầng mặc định, không phải
@@ -58,6 +59,25 @@ Anthropic đòi xen kẽ và `history` là dữ liệu client không được ti
 
 Query-rewriting vẫn **BỊ CHẶN** — xem DEC-8: phép đo ở phase 5 (n=12) cho hướng nhất quán nhưng
 chưa đủ để kết luận.
+
+## Tầng truy xuất — ba công tắc, mặc định chỉ bật một (DEC-10)
+
+Đường truy vấn sau P2 có bốn tầng, và ba tầng sau đều nằm sau một công tắc:
+
+```
+Query → [dense prefetch | BM25 prefetch] → RRF fusion → sàn liên quan
+      → rerank (mặc định noop) → metadata adjust (mặc định tắt) → top_k → LLM
+```
+
+DEC-10 chốt trạng thái mặc định **bằng số đo**, không bằng suy đoán: `retriever.hybrid`
+**bật** (+2.63 điểm hit-rate, +0.126 MRR, không thêm dependency), `rerank.provider=noop`
+và `metadata_adjust.enabled=false` **giữ tắt** vì cả hai không chứng minh được giá trị
+trên bộ eval hiện tại. Đọc DEC-10 trước khi bật lại bất kỳ cái nào — ở đó có cả ngưỡng
+để xét lại.
+
+Chuỗi giới hạn (mỗi số một việc, `top_k` chỉ có một nghĩa):
+`dense_prefetch_limit` 30 → `sparse_prefetch_limit` 30 → `fusion_limit` 30 →
+`rerank.top_n` 10 → `retriever.top_k` 5 (số đoạn LLM nhận).
 
 ## Luồng ingest (rút gọn)
 

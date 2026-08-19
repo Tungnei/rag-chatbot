@@ -30,6 +30,25 @@ curl -X POST localhost:8000/query \
 The three most recent exchanges are kept; anything older is trimmed server-side rather
 than rejected.
 
+### How a question is answered
+
+The current question is embedded and searched against the dense vectors; in parallel a
+BM25 branch matches on terms, and the two lists are merged with reciprocal rank fusion.
+A relevance floor then drops anything the dense branch did not vouch for, which is what
+stops an off-topic question being rescued into the context by a shared stopword. The
+surviving passages go to the model with instructions to answer only from them.
+
+Conversation history, when a client sends it, is used to interpret the question — never
+as a source, and never embedded. Only the current question drives retrieval.
+
+Two further layers exist behind switches and are **off by default**: cross-encoder
+reranking and metadata adjustment. Both were measured and neither improved results on
+the current eval set; DEC-10 records the numbers and the conditions for revisiting.
+
+Note on `sources[].score`: it is a cosine similarity by default, but becomes a
+cross-encoder logit (an unbounded, usually negative scale) when reranking is enabled.
+The UI prints it to three decimals either way.
+
 Browser UI: <http://localhost:8000/ui> — ask questions and read the sources side by side.
 Document management: <http://localhost:8000/ui/admin>.
 

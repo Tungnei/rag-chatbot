@@ -95,6 +95,34 @@ curl -sL -o /dev/null -w '%{http_code}\n' localhost:8000/ui   # expects 200
 `-L` is not optional on `/ui`: the static mount answers the bare path with a 307 to
 `/ui/`, so plain `curl localhost:8000/ui` prints 307 and looks broken when it is not.
 
+## Optional: cross-encoder reranking
+
+Off by default, and deliberately not part of a normal install — it pulls in torch.
+
+```bash
+uv sync --extra rerank            # adds sentence-transformers + CPU-only torch
+RERANK__PROVIDER=cross_encoder uv run rag-chatbot-tung
+```
+
+torch is pinned to the CPU wheel index; without that pin it drags in the entire CUDA
+toolkit, which is several gigabytes of GPU runtime for a model this project runs on CPU.
+
+For containers, build the separate target rather than the default one:
+
+```bash
+docker build --target runtime-rerank -t rag-chatbot-tung:rerank .
+```
+
+The default `runtime` target is untouched by any of this, so an operator who does not
+want the dependency does not pay for it. The model is baked into the image at build
+time rather than fetched on first start: that turns a container which mysteriously
+"starts slowly" while pulling ~90MB into a size visible in `docker image ls`, and it
+keeps air-gapped deployment possible.
+
+Measured before enabling it (DEC-10): on the current eval set the cross-encoder scored
+*worse* than fusion alone while costing ~1GB and roughly doubling retrieval latency.
+Read DEC-10 before turning it on.
+
 ## Upgrading an existing index to the hybrid schema
 
 Collections created before hybrid retrieval store a single **unnamed** vector. Hybrid

@@ -61,7 +61,9 @@ class LLMSettings(BaseModel):
 
 
 class RetrieverSettings(BaseModel):
-    top_k: int = 3
+    # The number of passages the LLM receives, and nothing else. Every intermediate
+    # limit below is internal and stays internal.
+    top_k: int = 5
     score_threshold: float = 0.3
     # Off by default so this can merge without changing production behaviour; turning
     # it back off is one variable rather than a revert.
@@ -90,6 +92,18 @@ class RerankSettings(BaseModel):
     model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
     device: str = "cpu"
     top_n: int = 10
+
+
+class MetadataAdjustSettings(BaseModel):
+    # Off by default like the other part-B layers: enabling it is one variable.
+    enabled: bool = False
+    max_per_source: int = 2
+    merge_adjacent: bool = True
+    # Added, not multiplied: a multiplier's effect would depend on the absolute
+    # score scale, which differs per reranker. Calibrated for the RRF range (~0.25-1.0)
+    # that the default noop reranker produces. A cross-encoder emits unbounded logits
+    # (measured: about -12 to -4), where this constant is far too small to matter.
+    title_boost: float = 0.05
 
 
 class APISettings(BaseModel):
@@ -121,6 +135,7 @@ class Settings(BaseSettings):
     llm: LLMSettings = Field(default_factory=LLMSettings)
     retriever: RetrieverSettings = Field(default_factory=RetrieverSettings)
     rerank: RerankSettings = Field(default_factory=RerankSettings)
+    metadata_adjust: MetadataAdjustSettings = Field(default_factory=MetadataAdjustSettings)
     chunking: ChunkingSettings = Field(default_factory=ChunkingSettings)
     api: APISettings = Field(default_factory=APISettings)
     storage: StorageSettings = Field(default_factory=StorageSettings)

@@ -13,8 +13,17 @@ POST /query {"question": "...", "history": [{"role", "content"}, ...]}
         │       history is never embedded (DEC-2)
         │
         ├─► QdrantVectorStore.search()         retrieval/vector_search.py
-        │       top_k nearest chunks above score_threshold
+        │       dense prefetch (score_threshold applies HERE, pre-fusion)
+        │       ‖ BM25 prefetch                 retrieval/sparse.py
+        │       → RRF fusion → relevance floor
         │       └─ no hits → return NO_CONTEXT_ANSWER, LLM never called
+        │
+        ├─► Reranker.rerank()                   rerank/  (default: noop)
+        │       reorders the fused candidates, cuts to rerank.top_n
+        │
+        ├─► metadata_adjust.adjust()            retrieval/metadata_adjust.py
+        │       boost → sort → merge → cap per source → cut to top_k
+        │       (disabled by default; the cut still applies)
         │
         ├─► build_rag_messages()               llm_generator/prompts.py
         │       system rules + history turns + numbered passages + question
@@ -94,8 +103,20 @@ whole suite runs offline.
 passages it was given, requires bracket citations, and specifies the exact sentence to
 return when the context is insufficient. Two further guards sit outside the prompt:
 
-- `retriever.score_threshold` drops weak matches before they reach the model.
+- `retriever.score_threshold` drops weak matches before they reach the model. Note
+  *where* it applies: inside the dense prefetch, not after fusion. An RRF score is a
+  function of rank and list count, not of similarity, so a cosine-calibrated cutoff
+  applied to a fused score would compare two different units.
+- A relevance floor after fusion keeps the BM25 branch from rescuing off-topic
+  questions into the context. BM25 matches on a single shared token and stopwords are
+  shared with every document, so without it an unrelated question returns passages and
+  the empty-result guard below stops firing.
 - An empty result set short-circuits — `NO_CONTEXT_ANSWER` is returned without an API call.
+
+Scores returned in `sources[]` are cosine similarities under the default configuration.
+With `rerank.provider=cross_encoder` they become cross-encoder logits instead — an
+unbounded scale, typically negative. The UI renders the number to three decimals either
+way, so it changes meaning without changing shape.
 
 Conversation history is held to a stricter rule than the passages. `SYSTEM_PROMPT`
 states that earlier turns are context for interpreting the current question only —

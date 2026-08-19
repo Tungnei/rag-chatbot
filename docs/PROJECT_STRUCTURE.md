@@ -14,6 +14,8 @@ rag-chatbot-tung/
 │   │   └── splitter.py                 # TextSplitter
 │   ├── embeddings/
 │   │   └── openai_embedder.py          # OpenAIEmbedder
+│   ├── rerank/                        # Reranker implementations (noop default,
+│   │                                  #   cross-encoder behind the  extra)
 │   ├── retrieval/
 │   │   ├── vector_search.py            # QdrantVectorStore
 │   │   └── document_retrieval.py       # loaders + IngestionPipeline
@@ -40,7 +42,7 @@ rag-chatbot-tung/
 ├── scripts/
 │   ├── ingest.py                       # bulk-index data/documents/
 │   └── run_eval.py                     # retrieval quality report
-├── tests/                              # 112 tests, fully offline
+├── tests/                              # 156 tests, fully offline
 ├── data/
 │   ├── documents/                      # source documents (2 samples included)
 │   ├── uploads/                        # files received via /ingest/upload
