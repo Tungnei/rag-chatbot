@@ -37,6 +37,13 @@ curl -sL -o /dev/null -w '%{http_code}\n' localhost:8000/ui
 curl -X POST localhost:8000/query -H 'Content-Type: application/json' \
      -d '{"question": "What embedding model is used?", "top_k": 5}'
 
+# Multi-turn: client replays history, server stays stateless. Last 3 exchanges kept,
+# capped by llm.history_token_budget so history cannot crowd out the passages.
+curl -X POST localhost:8000/query -H 'Content-Type: application/json' \
+     -d '{"question": "And how many dimensions?",
+          "history": [{"role": "user", "content": "Which embedding model?"},
+                      {"role": "assistant", "content": "text-embedding-3-small."}]}'
+
 curl -X POST localhost:8000/ingest -H 'Content-Type: application/json' \
      -d '{"path": "sample_faq.txt"}'
 

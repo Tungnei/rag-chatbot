@@ -1,0 +1,66 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P5",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-18T10:15:00+00:00",
+  "checks": [
+    {
+      "name": "tdd-red",
+      "status": "SKIP",
+      "detail": "N/A — phase do luong + tai lieu, khong co code san pham nen khong co vong do->xanh. Khong bia mot vong do de truong nay trong day du."
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 112 passed (111 -> 112, them test_case_id_is_stable_across_phrasings).",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 44 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 29 files"
+    },
+    {
+      "name": "dec2-measurement",
+      "status": "PASS",
+      "detail": "Chay that tren stack song, 3 con so theo dung yeu cau phase (khong phai 2): (a) co dai tu: hit-rate 66.67% (8/12), MRR 0.486. (b) tu du nghia (tran tren): hit-rate 83.33% (10/12), MRR 0.667. (c) moc tinh tao qa.jsonl chinh: 97.37%, MRR 0.722. Diff theo case (sau khi sua loi key, xem note): 0 case tot len, 2 case xau di — 'Vay con khi no khong tim thay gi thi sao?' va 'Cai do ton tien o cho nao?'. 2 case khac truot o CA HAI cach dien dat nen khong lien quan dai tu. Bao cao luu tai data/eval/multiturn-pronoun.json va multiturn-selfcontained.json.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "dec-recorded",
+      "status": "PASS",
+      "detail": "DEC-8 da ghi qua decision_register.py --append-alloc (KHONG sua tay docs/decisions.md). Nhanh C — chua ket luan duoc: huong nhat quan nhung toan bo hieu ung nam tren 2/12 case. Cong cua DEC-2 GIU NGUYEN TRANG THAI CHAN. DEC ghi ro can >=40 case multi-turn de ket luan. Nguoi quyet dinh: user:v.tungnt200@vinsmartfuture.tech, chon khi da nhin thay so that (dung nhu plan yeu cau). Canh bao trung DEC-4 cua script da kiem va la duong tinh gia: DEC-4 noi ve GET /documents + scroll-vs-facet, trung nhau chi o duong dan file. Khong supersede."
+    },
+    {
+      "name": "docs-sync",
+      "status": "PASS",
+      "detail": "docs/system-architecture.md: 'da quyet, CHUA trien khai' -> 'da trien khai' + chi tiet 3 luot / history_token_budget / chuan hoa role, va giu nguyen rang buoc 'chi cau hoi hien tai duoc embed' (doi thi tuong lai -> hien tai). docs/ARCHITECTURE.md: so do request flow co history + ghi ro history KHONG duoc embed; muc Grounding strategy them luat R5. README.md + docs/QUICK_REFERENCE.md: them vi du payload co history. DEC-1..DEC-7 -> DEC-1..DEC-8 o cac file tham chieu. Da grep lai: khong con cau nao noi multi-turn 'chua trien khai'."
+    },
+    {
+      "name": "bl-004-closed",
+      "status": "PASS",
+      "detail": "docs/code-standards.md:17 '78 passed' -> '112 passed'; docs/PROJECT_STRUCTURE.md:43 '45 tests' -> '112 tests'. BL-004 dong."
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "LOI DA TIM RA VA SUA TRONG CHINH PHASE NAY — quan trong nhat: --baseline cua run_eval.py (viet o phase 2) noi hai lan chay theo CHUOI CAU HOI. Lan chay co dai tu va lan chay tu du nghia dung chuoi khac nhau nen KHONG khop key nao, va no in ra 'gained 8, lost 0' TRONG KHI hit-rate tut 83.33% -> 66.67%. Mot ban diff tu mau thuan voi chinh tieu de cua no. Neu tin ket qua dau tien do, DEC-8 da ghi ket luan NGUOC HAN. Da sua: them case_id on dinh (luon la truong `question` goc) va noi diff theo case_id; co test giu (test_case_id_is_stable_across_phrasings). Sau khi sua: gained 0, lost 2 — khop chinh xac voi phep so sanh tay theo vi tri.",
+    "PHAT HIEN R9 (BL-015): gia thuyet 'multi-turn lam NO_CONTEXT_ANSWER bat ra thuong xuyen hon' SAI o tang orchestrator. Do duoc: 0/12 cau hoi co dai tu tra ve 0 chunk — moi case deu du 5 chunk (threshold 0.2, top_k 5), nen nhanh short-circuit orchestrator.py:61-67 KHONG BAO GIO chay va bo dem history_turns ma phase 3 them vao khong co gi de dem. Loi tu choi nguoi dung THUC SU nhan den tu LLM tu quyet dinh doan van khong du tra loi, va duong do KHONG sinh log. Da chung kien truc tiep 4 lan hom nay. Muon do dung phai dem chuoi NO_CONTEXT_ANSWER trong response body.",
+    "Log that chi co 1 dong 'no chunks above threshold' va no o dinh dang CU (truoc khi dong bo ma nguon vao container), tuc la ke tu khi multi-turn chay that, nhanh nay chua bat ra lan nao. Nhat quan voi phat hien tren.",
+    "DIEM DUNG AN TOAN DA DAT: multi-turn chay tu UI xuong LLM, da do, tai lieu da dong bo va khong con cau nao mo ta sai he thong, chua co dependency nang, chua dung schema Qdrant. Dung o day la mot ket cuc hop le.",
+    "Nguoi dung da chon TIEP TUC sang phan B (phase 6-10) sau khi nhin thay ca so lieu phase 2 (hit-rate kich tran 97.37%) lan phase 5 (n=12 chua ket luan duoc). Ghi nhan day la lua chon co thong tin."
+  ],
+  "run_seq": null
+}

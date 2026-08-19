@@ -3,21 +3,23 @@
 ## Request flow
 
 ```
-POST /query {"question": "..."}
+POST /query {"question": "...", "history": [{"role", "content"}, ...]}
         │
         ▼
   RAGOrchestrator.answer()                     orchestrator.py
         │
         ├─► OpenAIEmbedder.embed_query()       embeddings/openai_embedder.py
-        │       question → 1536-dim vector
+        │       CURRENT question only → 1536-dim vector
+        │       history is never embedded (DEC-2)
         │
         ├─► QdrantVectorStore.search()         retrieval/vector_search.py
         │       top_k nearest chunks above score_threshold
         │       └─ no hits → return NO_CONTEXT_ANSWER, LLM never called
         │
         ├─► build_rag_messages()               llm_generator/prompts.py
-        │       system rules + numbered passages + question
-        │       context trimmed to llm.context_token_budget
+        │       system rules + history turns + numbered passages + question
+        │       history trimmed to 3 exchanges and llm.history_token_budget FIRST,
+        │       context then gets whatever budget remains
         │
         └─► OpenAILLM.generate()               llm_generator/openai_llm.py
                 │
@@ -94,6 +96,13 @@ return when the context is insufficient. Two further guards sit outside the prom
 
 - `retriever.score_threshold` drops weak matches before they reach the model.
 - An empty result set short-circuits — `NO_CONTEXT_ANSWER` is returned without an API call.
+
+Conversation history is held to a stricter rule than the passages. `SYSTEM_PROMPT`
+states that earlier turns are context for interpreting the current question only —
+never evidence, never citable. The reason is that `history` arrives from the client,
+so a caller can fabricate an `assistant` turn asserting anything and ask a follow-up
+resting on it. History is also kept out of the numbered `[n]` block entirely, so it
+cannot be cited even by accident.
 
 ## Configuration precedence
 

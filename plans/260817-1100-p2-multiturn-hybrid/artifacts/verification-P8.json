@@ -1,0 +1,91 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P8",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-19T08:00:00+00:00",
+  "checks": [
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "2 test do vi ly do nghiep vu sau khi package ton tai: test_reranker_output_flows_into_sources va test_injected_reranker_gets_the_full_fan_out — ca hai do vi fixture sample_txt chi sinh DUNG MOT chunk nen khong quan sat duoc thu tu lan fan-out; da sua bang mot corpus 4 tai lieu trong chinh file test. test_build_reranker_cross_encoder_without_extra do voi ModuleNotFoundError tran -> lo ra rang try/except boc nham lenh (import module thanh cong, loi nam trong __init__), da sua sang boc phan khoi tao. TEST IMPORT-GUARD da chay HAI LAN theo dung yeu cau phase: lan dau ModuleNotFoundError (package chua co, do yeu), sau khi co package thi CHEN mot import torch o module scope -> test DO ('True False' != 'False False'); go ra -> XANH."
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 142 passed (130 -> 142, +12).",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 50 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 33 source files"
+    },
+    {
+      "name": "h4-offline-with-extra",
+      "status": "PASS",
+      "detail": "Cong quan trong nhat cua phase, da kiem TREN MAY DA CAI extra that (torch PRESENT, sentence_transformers PRESENT): uv run pytest -q -> 142 passed trong 4.17s, KHONG tai model nao. Hai lop: (1) test_build_reranker_... dung monkeypatch.setitem(sys.modules,...) nen tu dung dieu kien, khong phu thuoc trang thai .venv; (2) fixture autouse never_reach_huggingface dat HF_HUB_OFFLINE=1 + TRANSFORMERS_OFFLINE=1. Truoc khi cai extra suite cung xanh (142) — tuc la ca hai trang thai deu dat."
+    },
+    {
+      "name": "lazy-import-guard",
+      "status": "PASS",
+      "detail": "test_importing_rerank_package_does_not_import_torch chay trong subprocess sach. Kiem lai SAU KHI torch da duoc cai that: import rag_chatbot_tung.rerank -> 'torch' in sys.modules = False. grep '^from sentence_transformers|^import torch' trong src/ -> rong (moi import nang nam trong ham)."
+    },
+    {
+      "name": "h5-fan-out",
+      "status": "PASS",
+      "detail": "_reranks = reranker is not None or settings.rerank.provider != 'noop' — reranker inject qua constructor VAN duoc fan-out day du. test_injected_reranker_gets_the_full_fan_out giu dieu nay (top_k=1 nhung reranker nhan >1 ung vien). H5b: _effective_top_n = max(rerank.top_n, top_k) nen keo slider len 20 khong con bi cat im lang ve 10 — test_top_n_never_drops_below_requested_top_k giu."
+    },
+    {
+      "name": "b1-measured-not-bypassed",
+      "status": "PASS",
+      "detail": "evaluate_retrieval da chuyen sang goi orchestrator.retrieve() thay vi vector_store.search() truc tiep. Cong chong 'do nham duong': rerank.json KHAC fusion-noop.json (results identical? False; hit 1.0000 vs 0.9737). Tuc la tang rerank DA THAT SU duoc do, nen ket luan duoi day noi ve chat luong cua no, khong phai noi ve mot phep do chua bao gio goi toi no."
+    },
+    {
+      "name": "measurement-quality",
+      "status": "PASS",
+      "detail": "hybrid+noop: hit 100.00%, MRR 0.8474, fp 4, abstain 42.86%. hybrid+cross_encoder: hit 97.37%, MRR 0.8386, fp 4, abstain 42.86%. Diff theo case: gained 0, lost 1 ('Can bat nhung tien trinh nao va theo thu tu ra sao?'). KET LUAN DO DUOC: cross-encoder LAM XAU DI tren bo eval nay.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "measurement-latency",
+      "status": "PASS",
+      "detail": "Do tren cung 45 case, da bo qua lan goi dau (nap model): noop p50=821.1ms p95=2859.1ms; cross_encoder p50=1660.5ms p95=4318.7ms. p50 gap doi (+102%), p95 +51%. Chi phi rerank rieng ~840ms/truy van tren CPU. Ca hai con so deu duoc ghi lai, khong chi con so dep.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "measurement-image-size",
+      "status": "SKIP",
+      "detail": "KHONG DO DUOC: docker daemon khong verify duoc chung chi registry — 'ghcr.io/astral-sh/uv:python3.11-bookworm-slim ... x509: certificate signed by unknown authority'. Day dung la chuong ngai da ghi tu P1/P4 (daemon thieu root CA Vingroup, can sudo); docker-compose.override.yml chi tiem CA vao CONTAINER, khong vao daemon. SO DO DUOC THAY THE (ghi ro la proxy, khong phai image size): image runtime hien tai 448MB; venv 275M -> 1.3G (+1.0GB) sau khi cai extra CPU-only. Con so '~200MB -> ~2GB' trong ban nhap van la [ASSUMED] va da SAI o ve dau (runtime that la 448MB)."
+    },
+    {
+      "name": "airgap-container-run",
+      "status": "SKIP",
+      "detail": "Phu thuoc buoc build o tren nen cung khong chay duoc. Target runtime-rerank da viet (nuong model vao image qua HF_HOME) nhung CHUA TUNG DUOC BUILD — la code chua chay, khong duoc coi la da xac minh."
+    }
+  ],
+  "verdict": "PASS_WITH_RISK",
+  "notes": [
+    "KET QUA CHINH, VA NO LA KET QUA AM: cross-encoder khong dang gia tren he thong nay o thoi diem nay. Ba con so cong lai: +1.0GB dung luong, +51% p95 latency, va chat luong XAU DI (hit 100% -> 97.37%, MRR 0.847 -> 0.839, mat 1 case duoc 0 case). Khuyen nghi: giu rerank.provider=noop. Da dang ky BL-017.",
+    "DA LOAI TRU gia thuyet 'model mu tieng Viet' bang do doi chung thay vi doan: ms-marco-MiniLM-L-6-v2 phan biet duoc tieng Viet (lien quan -4.50 vs khong lien quan -11.21, cach biet 6.7) va cach biet do con RONG HON cap tieng Anh (-8.37 vs -11.17, cach biet 2.8). Nguyen nhan that la fusion DA DAT TRAN: hit 100%, MRR 0.847. Khi khong con cho de tang, mot tang xep lai chi co the di ngang hoac di xuong. Day chinh la BL-013 tra gia lan thu hai.",
+    "LOI THIET KE TRONG PLAN DA TIM RA VA SUA (BL-018): khai bao 'sentence-transformers>=3.0' tran keo theo torch ban CUDA -> cuda-toolkit + nvidia-nvjitlink/cuda-runtime/cufile + triton. Vai GB GPU runtime cho mot reranker ma chinh config cua plan dat device=cpu, va tren mang nay no TIMEOUT khong cai xong. Da xu: [tool.uv.sources] ghim torch vao index pytorch-cpu, VA phai khai bao torch thanh dependency TRUC TIEP cua extra vi tool.uv.sources khong ap dung cho dependency gian tiep. Ket qua: 0 goi nvidia trong uv.lock, torch 2.13.0+cpu, tai 183MB thay vi nhieu GB.",
+    "SU CO TU GAY RA VA DA SUA: them extra vao pyproject.toml lam uv.lock thanh cu, va uv doi re-resolve -> LENH CONG CHUAN 'uv run pytest -q' (docs/code-standards.md:10-15) HONG tren may nay vi khong verify duoc chung chi PyPI. Da khoi phuc bang cach chay uv lock voi SSL_CERT_FILE=/home/tungnt200/vingroup-ca-bundle.pem (bundle da co san tren may, dung cai ma docker-compose.override.yml dang mount vao container). Sau do 'uv run pytest -q' chay lai binh thuong: 142 passed. GHI CHU CHO NGUOI VAN HANH: moi lan doi dependency tren may nay deu can bien moi truong do, neu khong uv se khong resolve duoc.",
+    "Dockerfile: target 'runtime' KHONG doi mot dong (git diff --stat: 44 insertions, 0 deletions) — image mac dinh khong phinh mot byte. Target 'runtime-rerank' rieng, nuong model vao image (phuong an A) vi ly do KIEU LOI chu khong phai dung luong: tai luc runtime bien mot con so nhin thay duoc luc build thanh mot container 'khoi dong cham' trong khi keo 90MB qua mang co the chan HuggingFace. NHUNG target nay CHUA TUNG DUOC BUILD — chi la code chua chay.",
+    "Anh huong len UI can ghi vao tai lieu o phase 10: sau rerank, RetrievedChunk.score la diem cross-encoder (thang logit khong chan, vd -4.5, -11.2) chu khong con la cosine 0-1. Panel nguon o /ui hien Number(source.score).toFixed(3) nen se hien mot thang khac han ma khong doi hinh dang — kieu thay doi lam nguoi ta mat buoi chieu.",
+    "KHONG co test nao nap model that. CrossEncoderReranker chi duoc kiem qua duong 'chua cai thi bao loi ro rang'. Hanh vi that cua no da duoc do bang tay o muc measurement o tren, khong phai bang test. Dung doc '12 test rerank xanh' thanh 'cross-encoder da duoc kiem'.",
+    "TRANG THAI MAY SAU PHASE: .venv gio 1.3G vi da cai extra that de do. Suite van xanh va van offline. Neu muon tra lai 275M thi chay uv sync (khong kem --extra rerank)."
+  ],
+  "run_seq": null
+}

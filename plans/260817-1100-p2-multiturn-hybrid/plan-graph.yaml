@@ -1,0 +1,165 @@
+# Phase-DAG cho plan 260817-1100-p2-multiturn-hybrid.
+#
+# Đồ thị này là MỘT CHUỖI TUYẾN TÍNH, không có antichain nào — cố ý, không phải
+# lười. Hai lý do độc lập cùng ép ra kết quả đó:
+#   1. Logic: mỗi phase tiêu thụ đầu ra của phase ngay trước (eval baseline -> đổi
+#      hành vi -> đo lại; schema -> fusion -> rerank -> cắt top5).
+#   2. Xung đột file: bốn file bị nhiều phase cùng sửa (orchestrator.py,
+#      configs.py, configs/default.yaml, retrieval/vector_search.py). Bất kỳ hai
+#      phase nào nằm cùng antichain mà đụng chúng đều hỏng.
+# => KHÔNG chạy cook --parallel trên plan này. Không có gì để fan out.
+
+edges:
+  # --- PHẦN A: multi-turn ---
+  # Logic: nợ nghiệm thu P1 phải đóng trước khi chồng thêm hành vi mới lên /ui.
+  - {from: P1, to: P2}
+  # Logic: phải có baseline eval TRƯỚC khi đổi bất cứ thứ gì, nếu không mọi con
+  # số sau này không so được với cái gì. Đây là tiên quyết cứng (R1).
+  - {from: P2, to: P3}
+  # Logic: UI chỉ gửi được `history` sau khi QueryRequest có field đó.
+  - {from: P3, to: P4}
+  # Logic: bằng chứng cho gate DEC-2 cần cả backend lẫn UI chạy thật.
+  - {from: P4, to: P5}
+
+  # --- Ranh giới A/B: điểm dừng an toàn nằm ngay sau P5 ---
+  # Logic: phần B chỉ bắt đầu sau khi P5 đã ghi DEC kết luận. P5 cũng là chỗ
+  # phải ghi DEC MỚI cho việc chen phần B ra ngoài thứ tự DEC-3.
+  - {from: P5, to: P6}
+
+  # --- PHẦN B: hybrid retrieval ---
+  # Vừa logic vừa serializing: P7 đọc/ghi cùng retrieval/vector_search.py và
+  # tests/test_vector_search.py mà P6 vừa đổi schema. Không có cạnh này thì P7
+  # dựng prefetch trên collection vector-không-tên.
+  - {from: P6, to: P7}
+  # Vừa logic vừa serializing: cả hai sửa adaptor/protocols.py, orchestrator.py,
+  # configs.py, configs/default.yaml. Và rerank chỉ có nghĩa khi đã có top30 fusion.
+  - {from: P7, to: P8}
+  # Vừa logic vừa serializing: cả hai sửa orchestrator.py, configs.py,
+  # configs/default.yaml. metadata adjustment ăn top10 do cross-encoder trả ra.
+  - {from: P8, to: P9}
+  # Logic: bảng đóng góp từng tầng ở P10 chỉ lập được khi cả bốn tầng đã xong.
+  - {from: P9, to: P10}
+
+  # --- Cạnh SERIALIZING thuần (không phải quan hệ logic) ---
+  # P4 và P9 cùng sửa src/rag_chatbot_tung/api/static/index.html.
+  # Đã được chuỗi P4->P5->...->P9 bao trùm; ghi lại ở đây để lần sau ai đó định
+  # rút gọn chuỗi thì thấy ràng buộc này trước khi cắt.
+  # P2 và P7 cùng sửa src/rag_chatbot_tung/evaluate/metrics.py — cũng đã bị bao trùm.
+  # P5 và P10 cùng sửa docs/decisions.md, docs/ARCHITECTURE.md,
+  # docs/system-architecture.md, README.md, docs/QUICK_REFERENCE.md — đã bị bao trùm.
+
+subtasks:
+  P1:
+    # Nghiệm thu thủ công, KHÔNG có file nào thay đổi. Người dùng phải tự chạy
+    # (cần Qdrant thật + tài liệu đã nạp).
+    files_to_create: []
+    files_to_modify: []
+    post: [verification-P1.json]
+  P2:
+    files_to_create:
+      - data/eval/qa_multiturn.jsonl
+      - tests/test_metrics.py
+    files_to_modify:
+      - data/eval/qa.jsonl
+      - src/rag_chatbot_tung/evaluate/metrics.py
+      - scripts/run_eval.py
+    post: [verification-P2.json]
+  P3:
+    files_to_create: []
+    files_to_modify:
+      - src/rag_chatbot_tung/validate.py
+      - src/rag_chatbot_tung/llm_generator/prompts.py
+      - src/rag_chatbot_tung/configs.py
+      - configs/default.yaml
+      - src/rag_chatbot_tung/orchestrator.py
+      - tests/test_prompts.py
+      - tests/test_orchestrator.py
+      - tests/test_api.py
+    post: [verification-P3.json]
+  P4:
+    files_to_create: []
+    files_to_modify:
+      - src/rag_chatbot_tung/api/static/app.js
+      - src/rag_chatbot_tung/api/static/index.html
+      - tests/test_ui.py
+    post: [verification-P4.json]
+  P5:
+    files_to_create: []
+    files_to_modify:
+      - docs/decisions.md
+      - docs/system-architecture.md
+      - docs/ARCHITECTURE.md
+      - docs/QUICK_REFERENCE.md
+      - README.md
+    post: [verification-P5.json]
+  P6:
+    files_to_create:
+      - scripts/migrate_collection.py
+    files_to_modify:
+      - src/rag_chatbot_tung/retrieval/vector_search.py
+      - tests/test_vector_search.py
+      - docs/SETUP.md
+    post: [verification-P6.json]
+  P7:
+    files_to_create:
+      - src/rag_chatbot_tung/retrieval/sparse.py
+      - tests/test_sparse.py
+    files_to_modify:
+      - src/rag_chatbot_tung/adaptor/protocols.py
+      - src/rag_chatbot_tung/retrieval/vector_search.py
+      - src/rag_chatbot_tung/retrieval/document_retrieval.py
+      - src/rag_chatbot_tung/retrieval/__init__.py
+      - src/rag_chatbot_tung/orchestrator.py
+      - src/rag_chatbot_tung/evaluate/metrics.py
+      - src/rag_chatbot_tung/configs.py
+      - configs/default.yaml
+      - tests/test_vector_search.py
+    post: [verification-P7.json]
+  P8:
+    files_to_create:
+      - src/rag_chatbot_tung/rerank/__init__.py
+      - src/rag_chatbot_tung/rerank/noop.py
+      - src/rag_chatbot_tung/rerank/cross_encoder.py
+      - tests/test_rerank.py
+    files_to_modify:
+      - src/rag_chatbot_tung/adaptor/protocols.py
+      - src/rag_chatbot_tung/providers.py
+      - src/rag_chatbot_tung/configs.py
+      - configs/default.yaml
+      - src/rag_chatbot_tung/orchestrator.py
+      # B1: phase này tách RAGOrchestrator.retrieve() và metrics.py PHẢI chuyển
+      # sang gọi nó. Thiếu dòng này thì run_eval không bao giờ chạy qua rerank
+      # và bảng của P10 in cùng một con số ba lần.
+      - src/rag_chatbot_tung/evaluate/metrics.py
+      - pyproject.toml
+      - Dockerfile
+      - tests/test_providers.py
+      # H4: fixture autouse đặt HF_HUB_OFFLINE=1 / TRANSFORMERS_OFFLINE=1.
+      - tests/conftest.py
+    post: [verification-P8.json]
+  P9:
+    files_to_create:
+      - src/rag_chatbot_tung/retrieval/metadata_adjust.py
+      - tests/test_metadata_adjust.py
+    files_to_modify:
+      - src/rag_chatbot_tung/retrieval/__init__.py
+      - src/rag_chatbot_tung/orchestrator.py
+      - src/rag_chatbot_tung/configs.py
+      - configs/default.yaml
+      - src/rag_chatbot_tung/api/static/index.html
+      # B1: tầng metadata thay thế phép cắt trong retrieve(), nên đường đo phải
+      # đi qua nó. Cùng lý do với P8.
+      - src/rag_chatbot_tung/evaluate/metrics.py
+    post: [verification-P9.json]
+  P10:
+    files_to_create: []
+    files_to_modify:
+      - docs/ARCHITECTURE.md
+      - docs/system-architecture.md
+      - docs/PROJECT_STRUCTURE.md
+      - docs/QUICK_REFERENCE.md
+      - docs/SETUP.md
+      - docs/code-standards.md
+      - docs/decisions.md
+      - README.md
+    post: [verification-P10.json]

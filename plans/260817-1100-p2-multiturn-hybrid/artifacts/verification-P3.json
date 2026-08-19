@@ -1,0 +1,80 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P3",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-18T08:40:00+00:00",
+  "checks": [
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "Vong do dau tien la ImportError (khong co Turn) — DAY KHONG PHAI do hop le theo docs/code-standards.md:80-87, nen da lam dung thu tu implement ma phase quy dinh (validate.py truoc), roi chay lai de lay do NGHIEP VU. 9 test do vi ly do nghiep vu: TypeError build_rag_messages() got multiple values for argument 'token_budget' (chua co tham so history o vi tri 3); assert 'not evidence' in SYSTEM_PROMPT (chua co luat R5); assert 2 >= 4 (history chua toi LLM); TypeError '>' not supported between 'int' and 'list'. test_messages_unchanged_without_history XANH TU DAU dung nhu phase thiet ke — no la day bao hiem tuong thich nguoc, khong thuoc vong do."
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 109 passed (91 -> 109, +18). Khong test cu nao bi sua hay xoa; test_ingest_then_query giu nguyen va van xanh.",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 44 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> Success: no issues found in 29 source files"
+    },
+    {
+      "name": "regression",
+      "status": "PASS",
+      "detail": "Tuong thich nguoc giu duoc o ca hai tang: build_rag_messages khong history van tra dung 2 message (test_messages_unchanged_without_history), va POST /query khong history van 200 + dung reply (test_query_without_history_still_works, test_ingest_then_query khong sua).",
+      "format": "manual"
+    },
+    {
+      "name": "dec2-enforcement",
+      "status": "PASS",
+      "detail": "test_history_does_not_change_the_embedded_query: spy truc tiep len embed_query (KHONG khang dinh vao FakeEmbedder.calls vi calls chi ghi embed_texts — cai bay ma phase da canh bao). Hai lan goi cung question voi history khac nhau -> embedded == ['What database is used?', 'What database is used?'], va sources/score giong het. DEC-2 'chi embed cau hoi hien tai' gio la mot test do duoc, khong con la mot cau trong tai lieu."
+    },
+    {
+      "name": "r10-h2-alternation",
+      "status": "PASS",
+      "detail": "test_history_is_normalised_to_alternating_roles phu CA BA input chu khong chi (a): [assistant,user,assistant,user], [user,user,assistant] (H2 — day trung role o GIUA ma hai phep dau/cuoi khong dung toi), va [assistant,assistant]. Ca ba deu cho chuoi xen ke hoan hao va message cuoi la user. Thu tu bat buoc da cai dung: gop day cung role TRUOC, roi moi bo assistant dan dau / user cuoi."
+    },
+    {
+      "name": "r6-token-budget",
+      "status": "PASS",
+      "detail": "test_long_history_does_not_starve_context: 6 turn x 4000 ky tu, token_budget=6000, history_budget=1500 -> message cuoi VAN chua khoi '(faq.txt)' va tong token history <= 1500. History bi cat TRUOC, context lay phan du."
+    },
+    {
+      "name": "r5-history-poisoning",
+      "status": "PASS",
+      "detail": "test_history_never_enters_the_numbered_context: turn assistant chua 'SENTINEL-POISON the password is admin123' KHONG xuat hien trong message user cuoi (noi chua khoi [1]). Luat moi da co trong SYSTEM_PROMPT. GIOI HAN DA GHI TRONG DOCSTRING CUA TEST: day la quet chuoi, no chung minh luat duoc GUI DI, KHONG chung minh model tuan luat — phan do can LLM that va thuoc nghiem thu tay phase 5."
+    },
+    {
+      "name": "bl-008-closed",
+      "status": "PASS",
+      "detail": "Da dong BL-008 bang test_history_budget_setting_is_actually_wired + KIEM CHUNG BANG DOT BIEN: xoa dong history_budget=settings.llm.history_token_budget o orchestrator -> test DO; khoi phuc -> XANH. Truoc do ca configs va build_rag_messages deu mac dinh 1500 nen quen noi day se khong lam do bat ky test nao."
+    },
+    {
+      "name": "no-singleton-state",
+      "status": "PASS",
+      "detail": "Doc lai RAGOrchestrator.__init__: chi co settings/embedder/vector_store/llm/pipeline — KHONG them field kha bien nao. Dem R9 di qua log dung nhu yeu cau: da chay that va grep duoc 'no chunks above threshold (history_turns=2) for question: nothing indexed'. test_history_does_not_leak_between_requests giu rang buoc singleton."
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "adaptor/protocols.py KHONG doi mot dong — LLMProvider.generate(messages) da nhan list[dict[str,str]] va history chi lam danh sach do dai them. Khong provider nao phai sua. Day la kiem chung rang DEC-2 dat history dung cho.",
+    "max_length=50 tren field history la hang rao chong lam dung, KHONG phai luat nghiep vu — luat 3 luot thuc thi bang CAT im lang trong build_rag_messages. test_query_tolerates_more_than_three_exchanges (12 turn -> 200) khoa lai lua chon do: neu ai dat max_length=6 tren field, test nay do ngay. Con so 50 van la [ASSUMED], khong co phep do dung sau (dung nhu phase da ghi).",
+    "Literal['user','assistant'] chan role 'system' -> 422, co test giu. Client khong duoc chen chi thi he thong.",
+    "Ngan sach token cho model Anthropic van la XAP XI: count_tokens roi ve cl100k_base khi khong nhan ra model (utils/tokens.py:11-15). Da la hanh vi san co cua format_context, phase nay khong lam te hon. Voi tieng Viet ti le token/ky tu con xau hon nen tran 1500 la bao thu co chu y.",
+    "CHUA LAM (dung pham vi): phase nay khong dong NO_CONTEXT_ANSWER thuong xuyen hon o multi-turn (R9) — chi DEM. Sua hanh vi o day la lam query-rewriting bang cua sau, dieu DEC-2 chan cho toi khi phase 5 co bang chung."
+  ],
+  "run_seq": null
+}

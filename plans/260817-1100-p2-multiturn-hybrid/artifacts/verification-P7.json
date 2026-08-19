@@ -1,0 +1,79 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P7",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-19T04:30:00+00:00",
+  "checks": [
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "tests/test_sparse.py: module chua ton tai (do cau truc, da ghi nhan dung ban chat chu khong tinh la do nghiep vu). tests/test_vector_search.py: 6 test do vi LY DO NGHIEP VU — TypeError: QdrantVectorStore.__init__() got an unexpected keyword argument 'retriever' (chua co cong tac hybrid), va cac khang dinh ve fusion/prefetch/floor deu do vi nhanh hybrid chua ton tai."
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 130 passed (117 -> 130, +13). 4 call site search cu xanh khong sua.",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 46 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 30 source files"
+    },
+    {
+      "name": "r2-hash-stability",
+      "status": "PASS",
+      "detail": "term_index dung zlib.crc32. test_term_index_is_stable_across_processes chay 3 subprocess voi PYTHONHASHSEED 0/1/2 -> cung mot gia tri. TEST DOI CHUNG test_plain_hash_would_have_been_caught CO MAT va xanh: no chung minh chinh bo subprocess do THAT SU tao ra khac biet (hash('máy') cho >1 gia tri), nen test chinh khong phai xanh gia. grep 'hash(' trong sparse.py: chi xuat hien trong docstring giai thich, khong co loi goi tran nao."
+    },
+    {
+      "name": "r4-threshold-scale",
+      "status": "PASS",
+      "detail": "test_score_threshold_applies_inside_the_dense_prefetch khang dinh THANG vao doi tuong Prefetch gui cho client (dung spy ghi lai TUNG loi goi rieng, khong gop): dense.score_threshold == 0.3, sparse.score_threshold is None, va score_threshold NGOAI cua truy van fusion is None. Nhin thay bang mat trong so lieu that: thang diem doi tu cosine 0.2013-0.7032 (dense.json) sang RRF 0.2500-1.0000 (fusion.json)."
+    },
+    {
+      "name": "b2-grounding-floor",
+      "status": "PASS",
+      "detail": "San lien quan sau fusion da cai va CO HIEU LUC do duoc: false_positive dense=4 -> fusion=4 (KHONG TANG), abstain_rate 42.86% -> 42.86% (khong doi). Tuc la bat hybrid KHONG lam thung lop chong bia nhu B2 lo ngai. test_offtopic_query_still_abstains_under_hybrid giu dieu nay offline."
+    },
+    {
+      "name": "sparse-floor-measured",
+      "status": "PASS",
+      "detail": "Da DO phan bo diem BM25 tren bo eval phase 2 truoc khi chon so (yeu cau cung cua phase): tai lieu DUNG: n=38 min 5.720 p25 20.857 median 29.331 max 100.486; cau LAC DE: n=69 min 1.984 median 6.187 p75 8.194 max 34.398. HAI PHAN BO CHONG LEN NHAU (off-topic max 34.398 > correct min 5.720) nen khong co san nao tach sach duoc. Da thu nghiem 3 gia tri tren cung bo 45 case: floor=None -> hit 100%, MRR 0.861, fp 4, abstain 42.86%; floor=8 -> hit 100%, MRR 0.861, fp 7, abstain 0%; floor=30 -> hit 100%, MRR 0.874, fp 5, abstain 28.57%. KET LUAN DO DUOC: giu sparse_score_floor=None — mot san chi mua duoc toi da +0.013 MRR va lan nao cung tra bang grounding. Day la lua chon CO SO DO dang sau, khong phai mot o trong chua dien."
+    },
+    {
+      "name": "integration",
+      "status": "PASS",
+      "detail": "Re-ingest that: 39/39 point deu co vector 'bm25' (kiem bang scroll with_vectors). HYBRID OFF: hit 97.37%, MRR 0.721, fp 4 — TRUNG KHOP baseline phase 2/6, nen cong tac tat that su tat. HYBRID ON: hit 100.00%, MRR 0.861, fp 4. Diff theo case: gained 1 ('Doi mo hinh sinh vector roi thi co phai lam lai gi khong?' — dung case truot duy nhat cua baseline), lost 0.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "phase-gate",
+      "status": "PASS",
+      "detail": "Cong cua phase: hit-rate sau fusion phai HON baseline phase 2, neu khong thi DUNG truoc phase 8. 97.37% -> 100.00% va MRR 0.721 -> 0.861 (+19.4% tuong doi). Dat, duoc phep sang phase 8."
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "LOI NGHIEM TRONG TIM RA TRONG PHASE: upsert KHONG ghi sparse vector — ban sua goi _vectors_of khong ap dung duoc vi black da gop dong, nen code van dung {dense: ...} nhu cu. Hau qua neu lot: nhanh BM25 luon rong, hybrid ~ dense, va ket luan se la 'fusion khong giup gi'. Nghiem trong hon: test_upsert_stores_sparse_vector VAN XANH trong luc do vi no chi kiem 'search co tra ve point khong' — va point ve qua nhanh DENSE. Dung kieu xanh gia ma code-standards.md:84-87 canh bao. Da sua test thanh khang dinh THANG vao vector da luu (scroll with_vectors -> 'bm25' in stored.vector) cong mot truy van sparse thuan, va da KIEM CHUNG BANG DOT BIEN: pha lai upsert -> test do; khoi phuc -> xanh.",
+    "DANH DOI QUAN TRONG DA THANH TEST TUONG MINH: voi sparse_score_floor=None, chunk chi song sot neu prefetch dense DA QUA NGUONG bao lanh cho no. Nghia la BM25 XEP LAI duoc thu tu nhung KHONG BAO GIO them duoc tai lieu ma dense bo sot. Da tach thanh hai test cho ca hai nhanh (test_fusion_without_a_floor_cannot_add_what_dense_missed va test_fusion_with_a_measured_floor_admits_a_sparse_only_hit) thay vi giau danh doi nay di. So lieu that xac nhan danh doi la dung: recall khong mat gi (hit-rate dat 100%) vi dense prefetch lay toi 30 ung vien.",
+    "BL-013 DUOC XAC NHAN BANG SO: hit-rate chi tang 97.37% -> 100% (kich tran, chi con 1 case de tang), trong khi MRR tang 0.721 -> 0.861. MRR moi la cot noi len fusion co gia tri. Bang cua phase 10 phai lay MRR + false_positive lam cot chinh.",
+    "BL-014 DUOC XAC NHAN: cong cua phase 7 la 'giu false_positive <= 4' chu khong phai '= 0', vi dense-only da fp=4 tu baseline. Ket qua fp=4 sau fusion la DAT theo tieu chi dung; tieu chi goc trong phase file ('moi case null van tra NO_CONTEXT_ANSWER') chua bao gio dung ke ca o dense-only nen khong the la cong.",
+    "Han che da biet, ghi lai chu khong va: (1) tokenizer unigram tach am tiet tieng Viet nen 'máy học' thanh hai token roi — chap nhan, nua dense van giu ngu nghia, va them thu vien tach tu se danh mat chinh uu diem khong-dependency; (2) va cham crc32 ~1 lan tren 10^5 term — nhieu xep hang nhe, khong hong index; (3) prefetch sparse KHONG co nguong nen nhanh BM25 luon tra du limit ke ca khi khop rat yeu — RRF day chung xuong cuoi nhung chung VAN chiem cho trong top-30 di sang rerank; day la mot trong nhung thu phase 8 phai don.",
+    "Bat doi xung chuan hoa NFKC (ingest chuan hoa, cau hoi thi khong) da xu TRONG tokenize nen phuc vu ca hai chieu, khong phai sua orchestrator.py. Co test giu (test_tokenize_normalises_unicode) va test tu kiem tra rang hai dang NFC/NFD that su khac nhau.",
+    "adaptor/protocols.py van SACH ha tang: grep 'qdrant' -> rong. SparseVector la dataclass(slots=True) cua rieng tang adaptor; viec dich sang models.SparseVector nam tron trong vector_search.py.",
+    "tests/conftest.py KHONG phai sua — dung nhu phase du doan: khong co fake VectorStore nao, fixture dung chinh QdrantVectorStore that voi QdrantClient(':memory:'). Day la phan thuong cua quyet dinh o DEC-4."
+  ],
+  "run_seq": null
+}

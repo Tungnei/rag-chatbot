@@ -40,7 +40,7 @@ rag-chatbot-tung/
 ├── scripts/
 │   ├── ingest.py                       # bulk-index data/documents/
 │   └── run_eval.py                     # retrieval quality report
-├── tests/                              # 45 tests, fully offline
+├── tests/                              # 112 tests, fully offline
 ├── data/
 │   ├── documents/                      # source documents (2 samples included)
 │   ├── uploads/                        # files received via /ingest/upload

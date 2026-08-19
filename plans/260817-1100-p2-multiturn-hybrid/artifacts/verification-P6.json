@@ -1,0 +1,87 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P6",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-18T11:50:00+00:00",
+  "checks": [
+    {
+      "name": "dec-precondition",
+      "status": "PASS",
+      "detail": "DEC-9 ghi qua decision_register.py --append-alloc TRUOC khi viet dong code nao cua phase 6 (kiem: luc ghi DEC, git status chi co scripts/run_eval.py sua doi — la viec cua phase 2/5). Noi dung: chen hybrid retrieval vao giua P2 va P3, ly do, P3 hardening bi day lui, va 3 chi phi da chap nhan (re-ingest toan bo, torch o phase 8, top_k 3->5 khong co cong tac). Canh bao trung DEC-8 cua script da kiem: khong phai mot lan lat — DEC-8 giu query-rewriting BI CHAN, DEC-9 chi ghi deviation thu tu."
+    },
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "Lan dau la ImportError (chua co CollectionSchemaError) — KHONG hop le theo code-standards.md:80-87, nen them class exception truoc roi chay lai de lay do NGHIEP VU: 'AssertionError: hybrid needs NAMED vectors, not a bare VectorParams' (schema sai) va 'Failed: DID NOT RAISE CollectionSchemaError' x2 (R3: ensure_collection dang return im lang)."
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 117 passed (112 -> 117, +5). git diff --stat tests/test_vector_search.py = 57 insertions, 0 deletions.",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 44 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 29 files"
+    },
+    {
+      "name": "regression",
+      "status": "PASS",
+      "detail": "3 test search cu (test_search_returns_typed_chunks, test_score_threshold_filters_weak_matches, test_upsert_with_same_id_replaces) + toan bo tests/test_document_retrieval.py + tests/test_api.py XANH MA KHONG SUA MOT KY TU. Day la bang chung migration khong doi hanh vi duong dense."
+    },
+    {
+      "name": "integration",
+      "status": "PASS",
+      "detail": "MIGRATE THAT tren Qdrant song: 39 -> 39 diem, 8 -> 8 nguon, exit 0, 'migration verified'. Schema sau migrate: vectors={'dense'}, sparse_vectors={'bm25'} modifier=idf [kiem qua REST va qua python client]. App khoi dong lai duoc, /health ok, /query tra loi dung. Snapshot luu tai data/eval/migration-snapshot-20260818T113607Z.json.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "equivalence",
+      "status": "PASS",
+      "detail": "Cong quan trong nhat cua phase — chay lai qa.jsonl sau migrate va so voi baseline phase 2: hit_rate 97.37% -> 97.37%, MRR 0.721 -> 0.721, gained 0, lost 0, false_positive 4 (khong doi), phan bo score n=204 min 0.2013 max 0.7032 (trung khop). Doi schema KHONG lam xe dich duong dense mot chut nao."
+    },
+    {
+      "name": "r8-abort-path",
+      "status": "PASS",
+      "detail": "Da dien that: tro STORAGE__UPLOAD_DIR sang thu muc rong -> script liet ke dung 2 nguon khong con tren dia (CV_Nguyen_Thanh_Tung_Data_Engineer.pdf, chinh-sach-nghi-phep.txt), ABORT, exit code = 1, va collection KHONG bi dung toi (van 39 diem, van schema cu luc do). Dry-run exit 0 va KHONG de lai file trang thai nao."
+    },
+    {
+      "name": "b3-interrupted-run",
+      "status": "PASS",
+      "detail": "DIEN THAT tren collection nhap 'migration_rehearsal' (khong dung collection that): seed 655 diem / 10 nguon -> chay migrate roi GIET THAT bang timeout -s KILL 10 (exit 137) -> trang thai con lai: marker ton tai, snapshot MO voi baseline 655/10, collection mac ket o 11 diem. CHAY LAI: in 'RESUMING against the earlier snapshot', dung baseline GOC 655/10 chu KHONG doc lai 11 diem, chi co DUNG MOT snapshot (khong ghi de), ket qua 655 -> 655, exit 0, snapshot moi duoc dong. NHANH THAT BAI cung da kiem: cam mot snapshot mo khai 99999 diem -> sau khi nap lai chi con 2 -> in 'FAILED: the collection did not come back intact', exit 1, giu snapshot de resume. LAN THU NHAT KHONG THANH: pkill khong co trong image va PID da chet, nen run1 tu chay xong — da lam lai bang timeout -s KILL chu KHONG ghi nhan lan hong do la dat."
+    },
+    {
+      "name": "r3-operator-side",
+      "status": "PASS",
+      "detail": "Tao collection 'legacy_probe' voi vector khong ten roi goi startup(): CollectionSchemaError: collection 'legacy_probe' uses the pre-hybrid unnamed vector schema. Run: uv run python scripts/migrate_collection.py --yes — chan khoi dong va NEU DUNG TEN LENH."
+    },
+    {
+      "name": "docs",
+      "status": "PASS",
+      "detail": "docs/SETUP.md them muc 'Upgrading an existing index to the hybrid schema' (mot lan cho MOI Qdrant instance, khong phai moi checkout) va muc Troubleshooting 'The app will not start after upgrading' kem thong bao loi nguyen van."
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "LOI TIM RA VA SUA TRONG PHASE (BL-016, nghiem trong): script theo thiet ke cua plan nap lai theo THU MUC. Do duoc tren may nguoi dung: index co 8 nguon / 39 diem, nhung data/uploads/ con 2 PDF KHONG nam trong index (KB_SAP_PnL_VinMotion.pdf ~603 chunk, Checkpoint VPN guideline). Nap theo thu muc se cho ra ~644 diem thay vi 39 — tuc la LAM SONG LAI tai lieu nguoi dung da chu dong xoa (DELETE /documents xoa vector nhung DE LAI file), va pha huy moi phep so sanh cua phase 7-10 vi baseline phase 2 do tren corpus 39 diem. Da xac nhan bang thuc nghiem: seed rehearsal bang ingest_directory cho ra 655 diem / 10 nguon dung nhu du doan. DA SUA theo lua chon cua nguoi dung: chi nap lai dung danh sach nguon trong snapshot, co test giu (test_migration_reingests_only_snapshot_sources). Ket qua that: 39 -> 39, 8 -> 8.",
+    "LOI THU HAI tu sua: dry-run ban dau GHI snapshot ra dia, ma dieu kien resume cua toi lai coi 'co snapshot mo' la bang chung mot lan chay bi dut. Hau qua: chay dry-run hom nay -> tuan sau migrate that se 'resume' theo baseline CU DA LOI THOI. Da sua: dry-run khong ghi gi ca; resume chi kich hoat khi CO MARKER hoac (collection da hybrid VA con snapshot mo). Kiem: chay dry-run hai lan lien tiep -> khong resume, khong de lai file nao.",
+    "PHASE NAY KHONG BAT HYBRID. Sparse vector 'bm25' da duoc KHAI BAO nhung chua co diem nao ghi vao no — co y, de chi migrate MOT lan thay vi hai. Duong truy van van la dense-only, va so lieu equivalence o tren chung minh dieu do.",
+    "RUI RO CON LAI KHONG XOA DUOC (da ghi trong DEC-9 va SETUP.md): nguon nap qua POST /ingest voi url khong co ban sao tren dia. Lan nay khong co nguon nao nhu vay (8/8 deu tim thay tren dia) nen khong mat gi, nhung lan sau thi chua chac.",
+    "Cach phat hien schema dua vao hinh dang config.params cua qdrant-client 1.19.0. Mot ban nang cap co the doi hinh dang do; khi ay test 1 va 2 se do ngay vi chung khang dinh thang vao cau truc — chung chinh la cai bao dong.",
+    "Container dang chay ma nguon dong bo bang docker cp (khong build lai duoc image vi daemon thieu root CA — xem verification-P4). vector_search.py da duoc dong bo vao container TRUOC khi migrate, neu khong app cu se ghi/doc vector khong ten vao collection co ten va no ngay."
+  ],
+  "run_seq": null
+}

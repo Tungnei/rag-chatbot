@@ -90,3 +90,29 @@ affects: ".env.example,README.md"
 ## DEC-7 — OpenRouter phuc vu ca chat lan embeddings; ca hai nua chay qua mot khoa duy nhat
 
 Do truc tiep: POST https://openrouter.ai/api/v1/embeddings voi model 'openai/text-embedding-3-small' tra vector 1536 chieu, dung bang QDRANT__VECTOR_SIZE nen KHONG phai index lai. Chat 'openai/gpt-4o-mini' cung chay (OpenRouter dinh tuyen qua Azure). Vi OpenRouter noi giao thuc OpenAI nen cau hinh dung la LLM__PROVIDER=openai + LLM__BASE_URL + EMBEDDINGS__BASE_URL, khong can adapter moi. Dieu nay KHONG lat DEC-5: Anthropic van khong co embeddings; diem khac la gateway nao dung sau. Bai hoc ghi lai de khoi suy dien: kha nang cua mot gateway phai DO chu khong suy ra tu viec no la gateway.
+
+---
+id: DEC-8
+status: active
+date: 2026-08-18
+actor: "user:v.tungnt200@vinsmartfuture.tech"
+ts: "2026-08-18T11:23:58.959622+00:00"
+affects: "docs/decisions.md, scripts/run_eval.py, src/rag_chatbot_tung/evaluate/metrics.py, data/eval/qa_multiturn.jsonl"
+---
+
+## DEC-8 — Cong query-rewriting cua DEC-2 van DONG: do duoc voi n=12 chua du ket luan
+
+Phase 5 chay phep do ma DEC-2 doi hoi, tren data/eval/qa_multiturn.jsonl (12 case, moi case mot cap question co dai tu / question_selfcontained tu du nghia, cung expected_source). Ket qua: co dai tu hit-rate 66.67% (8/12) MRR 0.486; tu du nghia hit-rate 83.33% (10/12) MRR 0.667. Moc tinh tao: qa.jsonl chinh 97.37% / MRR 0.722. Diff theo tung case: 0 case tot len, 2 case xau di ('Vay con khi no khong tim thay gi thi sao?' va 'Cai do ton tien o cho nao?'); 2 case khac truot o CA HAI cach dien dat nen khong lien quan toi dai tu. HUONG cua bang chung nhat quan (khong co nhieu nguoc chieu) nhung TOAN BO hieu ung nam tren 2 case trong 12 — khong du de goi la 'dang ke'. Theo dung nhanh C ma plan du lieu: KHONG ep thanh A hay B. Ket luan: cong cua DEC-2 GIU NGUYEN TRANG THAI CHAN, query-rewriting van chua duoc phep. De ket luan duoc can bo multi-turn >= 40 case (gap ~3.3 lan hien tai) de mot case khong con doi duoc ket qua. Ghi kem hai phat hien lam thay doi cach doc so lieu: (1) --baseline cua run_eval.py truoc do noi hai lan chay theo CHUOI CAU HOI nen hai cach dien dat khong khop key, bao 'gained 8 lost 0' trong khi hit-rate TUT — da sua sang case_id on dinh va co test giu, neu tin ban dau thi DEC nay da ghi ket luan nguoc. (2) Gia thuyet R9 'multi-turn lam NO_CONTEXT_ANSWER bat ra thuong xuyen hon' la SAI o tang orchestrator: 0/12 cau hoi co dai tu tra ve 0 chunk, moi case deu du 5 chunk, nen nhanh short-circuit khong bao gio chay va bo dem qua log khong co gi de dem; loi tu choi that su den tu LLM va duong do khong sinh log (xem BL-015).
+
+---
+id: DEC-9
+status: active
+date: 2026-08-18
+actor: "user:v.tungnt200@vinsmartfuture.tech"
+ts: "2026-08-18T11:27:16.792856+00:00"
+affects: "src/rag_chatbot_tung/retrieval/vector_search.py, scripts/migrate_collection.py, configs/default.yaml, docs/SETUP.md"
+---
+
+## DEC-9 — Chen hybrid retrieval vao giua P2 va P3 hardening — deviation co y thuc khoi thu tu DEC-3
+
+DEC-3 chot thu tu thi cong P1 UI localhost -> P2 multi-turn -> P3 hardening -> moi mo internet. Hybrid retrieval (dense+BM25 RRF fusion, cross-encoder rerank, metadata adjustment) KHONG nam trong thu tu do: no la mot hang muc moi chen vao giua P2 va P3. DEC nay ghi nhan deviation thay vi de plan tu lat DEC-3. LY DO: nguoi dung chot pham vi dot nay gom ca phan A (multi-turn) lan phan B (hybrid retrieval), va tai gate phase 5 da xac nhan tiep tuc sang phase 6-10 SAU KHI nhin thay hai so lieu bat loi: (a) phase 2 do duoc hit-rate baseline da kich tran 97.37% nen fusion/rerank/metadata gan nhu khong the chung minh gia tri qua hit-rate — chi MRR 0.7215 va false_positive 4/7 con du dia (BL-013); (b) phase 5 voi n=12 chua ket luan duoc ve query-rewriting, tuc la phuong an RE HON phan B van chua bi loai (DEC-8). CAI BI DAY LUI: P3 hardening (auth qua reverse proxy, rate limit, siet CORS, tran chi tieu) lui lai sau toan bo phase 6-10. He thong van o localhost trong suot thoi gian do, dung theo DEC-3 — plan nay khong dung CORS, khong dung auth, khong doi port binding, khong them endpoint cong khai. CHI PHI DA BIET VA DUOC CHAP NHAN: (1) mot lan re-ingest TOAN BO vi doi schema collection tu vector khong ten sang vector co ten dense + sparse bm25 — khong co duong migrate tai cho, va nguon nap qua URL khong co ban sao tren dia se mat vinh vien; (2) dependency nang torch/sentence-transformers o phase 8, la dependency nang duy nhat cua ca repo tu truoc toi nay; (3) top_k mac dinh doi 3->5 o phase 9 lam tang ~67% token context moi truy van va KHONG nam sau cong tac nao. Giam nhe: moi tang moi ship voi cong tac mac dinh TAT (retriever.hybrid=false, rerank.provider=noop, metadata_adjust.enabled=false) nen merge duoc tung phase ma khong doi hanh vi production.

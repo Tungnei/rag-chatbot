@@ -16,7 +16,19 @@ curl -X POST localhost:8000/ingest \
 curl -X POST localhost:8000/query \
      -H 'Content-Type: application/json' \
      -d '{"question": "What embedding model is used by default?"}'
+
+# Follow-up question, carrying the conversation so far. The server stores nothing —
+# the client owns the history and replays it (DEC-2). Only the current question is
+# embedded for retrieval; history is used by the model to interpret it.
+curl -X POST localhost:8000/query \
+     -H 'Content-Type: application/json' \
+     -d '{"question": "How many dimensions does it produce?",
+          "history": [{"role": "user", "content": "What embedding model is used?"},
+                      {"role": "assistant", "content": "text-embedding-3-small."}]}'
 ```
+
+The three most recent exchanges are kept; anything older is trimmed server-side rather
+than rejected.
 
 Browser UI: <http://localhost:8000/ui> — ask questions and read the sources side by side.
 Document management: <http://localhost:8000/ui/admin>.
