@@ -1,0 +1,868 @@
+{
+  "total": 45,
+  "scored": 38,
+  "hits": 37,
+  "hit_rate": 0.9736842105263158,
+  "mrr": 0.7214912280701754,
+  "abstain_correct": 3,
+  "false_positive": 4,
+  "abstain_rate": 0.42857142857142855,
+  "results": [
+    {
+      "question": "What web framework serves the REST API?",
+      "expected_source": "sample_faq.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.29469228,
+        0.28321072,
+        0.26318812,
+        0.25934005,
+        0.2250585
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_faq.txt",
+        "CV_Nguyen_Thanh_Tung_Data_Engineer.pdf",
+        "sample_guide.md",
+        "CV_Nguyen_Thanh_Tung_Data_Engineer.pdf"
+      ]
+    },
+    {
+      "question": "Which file types can I feed into the system?",
+      "expected_source": "sample_faq.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.49651635,
+        0.3404122,
+        0.3207984,
+        0.30939263,
+        0.30569088
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_faq.txt",
+        "sample_guide.md",
+        "sample_guide.md",
+        "sample_faq.txt"
+      ]
+    },
+    {
+      "question": "How many chunks come back for a single question by default?",
+      "expected_source": "sample_faq.txt",
+      "hit": true,
+      "rank": 3,
+      "scores": [
+        0.57032484,
+        0.48618323,
+        0.45179576,
+        0.37018138,
+        0.30524534
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_guide.md",
+        "sample_faq.txt",
+        "sample_guide.md",
+        "sample_guide.md"
+      ]
+    },
+    {
+      "question": "What stops the bot from inventing an answer?",
+      "expected_source": "sample_faq.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.3791469,
+        0.34982052,
+        0.30714425,
+        0.27652574,
+        0.2558851
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_faq.txt",
+        "kien-truc-he-thong.md",
+        "sample_guide.md",
+        "sample_guide.md"
+      ]
+    },
+    {
+      "question": "If I edit a file and load it again, do I get duplicates?",
+      "expected_source": "sample_faq.txt",
+      "hit": true,
+      "rank": 4,
+      "scores": [
+        0.31453282,
+        0.28727856,
+        0.24349791,
+        0.2368258,
+        0.22327751
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md",
+        "sample_faq.txt",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Which Python version do I need before installing?",
+      "expected_source": "sample_guide.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.4005427,
+        0.26437303
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_guide.md"
+      ]
+    },
+    {
+      "question": "How do I pull in a web page instead of a local file?",
+      "expected_source": "sample_guide.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.4626599,
+        0.250991,
+        0.22048041,
+        0.2102983
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_guide.md",
+        "sample_guide.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "What fields come back in the answer payload?",
+      "expected_source": "sample_guide.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.43725628,
+        0.34139368,
+        0.3172015,
+        0.26454526,
+        0.2557658
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_guide.md",
+        "sample_faq.txt",
+        "sample_faq.txt",
+        "sample_guide.md"
+      ]
+    },
+    {
+      "question": "Does making chunks smaller help or hurt accuracy?",
+      "expected_source": "sample_guide.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.5130396,
+        0.4202788,
+        0.3134779,
+        0.2407514,
+        0.20616053
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_guide.md",
+        "sample_faq.txt",
+        "sample_guide.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Inside docker compose, what hostname should point at the database?",
+      "expected_source": "sample_guide.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.4349442,
+        0.2656382,
+        0.20127404
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_faq.txt",
+        "sample_guide.md"
+      ]
+    },
+    {
+      "question": "What is the trade-off when I raise the number of retrieved chunks?",
+      "expected_source": "sample_guide.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.5595678,
+        0.43652433,
+        0.3836516,
+        0.27179953,
+        0.22834255
+      ],
+      "sources": [
+        "sample_guide.md",
+        "sample_guide.md",
+        "sample_faq.txt",
+        "sample_guide.md",
+        "sample_guide.md"
+      ]
+    },
+    {
+      "question": "Hệ thống được chia thành mấy tầng và tầng nào biết tầng nào?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.7031512,
+        0.49285847,
+        0.4701869,
+        0.41331613,
+        0.40864417
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "kien-truc-he-thong.md",
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "question": "Vì sao lại dùng giao thức thay vì cho kế thừa từ lớp cha?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 3,
+      "scores": [
+        0.44914365,
+        0.43713742,
+        0.4361639,
+        0.42589957,
+        0.42272216
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "kien-truc-he-thong.md",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "question": "Thêm một nhà cung cấp mới thì phải sửa những chỗ nào?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.46539283,
+        0.4492099,
+        0.43413705,
+        0.39499158,
+        0.3868471
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Khi không tìm được đoạn nào phù hợp thì chuyện gì xảy ra?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 4,
+      "scores": [
+        0.51487505,
+        0.44099617,
+        0.42253274,
+        0.41889617,
+        0.4175843
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Tệp Markdown được cắt theo cách nào so với tệp văn bản thường?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.6546679,
+        0.45048624,
+        0.4330777,
+        0.42854965,
+        0.39846492
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "question": "Chạy nạp hai lần cho cùng một tệp có sinh ra bản trùng không?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.6276418,
+        0.608649,
+        0.5719653,
+        0.5139115,
+        0.47808036
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Nếu vừa đặt biến môi trường vừa ghi trong tệp YAML thì cái nào thắng?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.4942919,
+        0.47354728,
+        0.41363677,
+        0.3778457,
+        0.3749532
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Cần bật những tiến trình nào và theo thứ tự ra sao?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.5509007,
+        0.49734402,
+        0.47239965,
+        0.4681985,
+        0.4563328
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "question": "Tiền phát sinh chủ yếu ở bước nào khi nạp tài liệu?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 4,
+      "scores": [
+        0.5981591,
+        0.58233404,
+        0.5501817,
+        0.5463731,
+        0.53624845
+      ],
+      "sources": [
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "question": "Điểm cuối kiểm tra tình trạng cho biết những gì?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.6002443,
+        0.47788566,
+        0.47431102,
+        0.44710746,
+        0.44707775
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Muốn sao lưu thì phải chép cái gì mới đúng?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.47880137,
+        0.43491894,
+        0.4241417,
+        0.41102225,
+        0.39345345
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Sửa tệp môi trường xong mà giá trị mới không có hiệu lực, vì sao?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.55804527,
+        0.50153977,
+        0.4999262,
+        0.4719303,
+        0.43920434
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Trước khi triển khai phải chạy những lệnh kiểm tra nào?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.6865129,
+        0.4595308,
+        0.44126076,
+        0.44106358,
+        0.43815318
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Nếu cơ sở dữ liệu chưa sẵn sàng lúc ứng dụng bật lên thì sao?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.50363255,
+        0.4750058,
+        0.4701412,
+        0.45751524,
+        0.4370306
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Truy vấn báo lỗi năm trăm thì nên xem ở đâu trước?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.57875276,
+        0.4377127,
+        0.43289077,
+        0.39324653,
+        0.39089656
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Vì sao kiểm tra tình trạng vẫn xanh mà truy vấn lại hỏng?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.519456,
+        0.49968472,
+        0.4827307,
+        0.4671107,
+        0.44206792
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Mọi câu hỏi đều bị từ chối trả lời, nên nghi ngờ điều gì đầu tiên?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.6016221,
+        0.57147396,
+        0.48772615,
+        0.4469438,
+        0.4352224
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Đổi mô hình sinh vector rồi thì có phải làm lại gì không?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.5451519,
+        0.5447962,
+        0.53418875,
+        0.52948457,
+        0.525005
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "huong-dan-van-hanh.md",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "question": "Bot trả lời trôi chảy nhưng trích sai chỗ, xử lý thế nào?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.59393716,
+        0.54333866,
+        0.51516366,
+        0.5133873,
+        0.48889405
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Phần nào chiếm nhiều thời gian nhất trong một lần hỏi?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.4420175,
+        0.43393978,
+        0.43028826,
+        0.41885817,
+        0.3545497
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "question": "Sửa nội dung tệp rồi nạp lại mà câu trả lời vẫn cũ, lỗi ở đâu?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.6916456,
+        0.5519814,
+        0.50655335,
+        0.48886755,
+        0.4882061
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Tài liệu được xếp thành mấy nhóm nhạy cảm?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.44946182,
+        0.42381632,
+        0.41638625,
+        0.41608775,
+        0.41178054
+      ],
+      "sources": [
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "question": "Có được đưa sơ yếu lý lịch của ứng viên vào hệ thống không?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.4654842,
+        0.46315873,
+        0.4586108,
+        0.4509092,
+        0.44707087
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Xoá một nguồn khỏi chỉ mục thì tệp gốc có mất theo không?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.62054676,
+        0.53984964,
+        0.5142398,
+        0.48688197,
+        0.45786673
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Bản sao lưu được giữ trong bao lâu?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.48292354,
+        0.4772642,
+        0.4222126,
+        0.41569847,
+        0.40595096
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Ai chịu trách nhiệm phân loại mức nhạy cảm của tài liệu?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.47990584,
+        0.47789255,
+        0.45124084,
+        0.4358463,
+        0.42604852
+      ],
+      "sources": [
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "question": "Quy trình cũ hết hiệu lực thì nên làm gì với nó?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.46081543,
+        0.45412803,
+        0.45086637,
+        0.44957292,
+        0.43139637
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Làm thế nào để đăng ký thi bằng lái xe ô tô hạng B2?",
+      "expected_source": null,
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.3789369,
+        0.33185548,
+        0.33133304,
+        0.3188725,
+        0.31682366
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "question": "Giá vé máy bay khứ hồi đi Paris vào tháng sau là bao nhiêu?",
+      "expected_source": null,
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.3003127,
+        0.29583988,
+        0.28601393,
+        0.2711868,
+        0.27014232
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "chinh-sach-nghi-phep.txt",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Công thức nấu phở bò truyền thống cần những nguyên liệu gì?",
+      "expected_source": null,
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.30328757,
+        0.2949062,
+        0.29228893,
+        0.29144648,
+        0.29047537
+      ],
+      "sources": [
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Đội tuyển nào vô địch World Cup gần đây nhất?",
+      "expected_source": null,
+      "hit": true,
+      "rank": null,
+      "scores": [],
+      "sources": []
+    },
+    {
+      "question": "How do I replace the timing belt on a diesel engine?",
+      "expected_source": null,
+      "hit": true,
+      "rank": null,
+      "scores": [],
+      "sources": []
+    },
+    {
+      "question": "What is the best fertiliser schedule for growing tomatoes?",
+      "expected_source": null,
+      "hit": true,
+      "rank": null,
+      "scores": [],
+      "sources": []
+    },
+    {
+      "question": "Thủ tục xin visa du học Nhật Bản gồm những bước nào?",
+      "expected_source": null,
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.32685858,
+        0.3211801,
+        0.31531477,
+        0.3125615,
+        0.31171137
+      ],
+      "sources": [
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-nghi-phep.txt",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt"
+      ]
+    }
+  ],
+  "top_k": 5,
+  "score_threshold": 0.2,
+  "cases_file": "/tmp/qa.jsonl",
+  "selfcontained": false
+}

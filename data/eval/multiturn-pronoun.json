@@ -1,0 +1,256 @@
+{
+  "total": 12,
+  "scored": 12,
+  "hits": 8,
+  "hit_rate": 0.6666666666666666,
+  "mrr": 0.4861111111111111,
+  "abstain_correct": 0,
+  "false_positive": 0,
+  "abstain_rate": 0.0,
+  "results": [
+    {
+      "question": "Nó lưu dữ liệu ở đâu?",
+      "expected_source": "sample_faq.txt",
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.5030774,
+        0.4935414,
+        0.4514492,
+        0.44258463,
+        0.4302717
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "question": "Vậy còn khi nó không tìm thấy gì thì sao?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.40980706,
+        0.40160775,
+        0.38830608,
+        0.38484734,
+        0.38351133
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Cái đó tốn tiền ở chỗ nào?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.39730453,
+        0.37050727,
+        0.36792856,
+        0.3627091,
+        0.34857237
+      ],
+      "sources": [
+        "chinh-sach-du-lieu.txt",
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "question": "Thế nó có xoá luôn tệp gốc không?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.50891995,
+        0.490954,
+        0.47292784,
+        0.46008578,
+        0.45347244
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "question": "Tại sao lại như vậy?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.41705525,
+        0.41521,
+        0.39472976,
+        0.36577535,
+        0.36332667
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "question": "Giải thích rõ hơn phần đó đi.",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 3,
+      "scores": [
+        0.44531384,
+        0.40498495,
+        0.38759643,
+        0.37514347,
+        0.36712196
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Giữ được bao lâu?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.4363802,
+        0.4013734,
+        0.39474857,
+        0.3921264,
+        0.37569898
+      ],
+      "sources": [
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-nghi-phep.txt",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Phải làm gì để nó có hiệu lực?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.42231262,
+        0.42124513,
+        0.4191702,
+        0.41784763,
+        0.41256315
+      ],
+      "sources": [
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "question": "Cái nào thắng?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.30517507,
+        0.28839165,
+        0.287165,
+        0.28045815,
+        0.2760538
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Nghi ngờ gì đầu tiên?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.41798353,
+        0.4007562,
+        0.38619614,
+        0.38433337,
+        0.37641466
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "question": "Nó có làm mất context không?",
+      "expected_source": "sample_guide.md",
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.44164792,
+        0.43506485,
+        0.42519438,
+        0.4033511,
+        0.4018662
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "question": "Bước nào chậm nhất?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.4179113,
+        0.40949297,
+        0.372592,
+        0.36521313,
+        0.36158127
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md"
+      ]
+    }
+  ],
+  "top_k": 5,
+  "score_threshold": 0.2,
+  "cases_file": "/tmp/qa_multiturn.jsonl",
+  "selfcontained": false
+}

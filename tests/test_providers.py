@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import sys
+
 import pytest
 
 from rag_chatbot_tung.configs import Settings
 from rag_chatbot_tung.embeddings import OpenAIEmbedder
 from rag_chatbot_tung.llm_generator import AnthropicLLM, OpenAILLM
-from rag_chatbot_tung.providers import build_embedder, build_llm
+from rag_chatbot_tung.providers import build_embedder, build_llm, build_reranker
+from rag_chatbot_tung.rerank import NoopReranker
 
 
 def make_settings(**overrides) -> Settings:
@@ -44,3 +47,25 @@ def test_missing_key_for_selected_provider_names_the_variable():
     settings = Settings(openai_api_key="k", anthropic_api_key="", llm={"provider": "anthropic"})
     with pytest.raises(ValueError, match="ANTHROPIC_API_KEY"):
         build_llm(settings)
+
+
+def test_build_reranker_defaults_to_noop(settings):
+    assert isinstance(build_reranker(settings), NoopReranker)
+
+
+def test_build_reranker_cross_encoder_without_extra_raises_clearly(settings, monkeypatch):
+    """Names the extra to install instead of surfacing a bare ModuleNotFoundError.
+
+    The condition is constructed rather than assumed: on a machine that HAS run
+    `uv sync --extra rerank`, letting this reach the real branch would build a
+    CrossEncoder and pull ~90MB from HuggingFace in the middle of the suite — exactly
+    the offline rule this repo keeps. Blanking the module makes the test deterministic
+    on every machine regardless of what is installed.
+    """
+    monkeypatch.setitem(sys.modules, "sentence_transformers", None)
+    settings.rerank.provider = "cross_encoder"
+
+    with pytest.raises(ValueError) as excinfo:
+        build_reranker(settings)
+
+    assert "uv sync --extra rerank" in str(excinfo.value)

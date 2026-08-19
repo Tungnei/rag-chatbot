@@ -14,9 +14,10 @@
 
     <main class="layout">
       <section class="chat" aria-label="Hội thoại">
-        <p id="single-turn-notice" class="notice">
-          Mỗi câu hỏi được trả lời độc lập — bot <strong>không nhớ</strong> câu hỏi trước đó.
-          Hãy hỏi trọn ý trong một câu.
+        <p id="history-notice" class="notice">
+          Bot nhớ <strong>3 lượt</strong> hỏi-đáp gần nhất. Lịch sử chỉ nằm trong trang
+          này và mất khi bạn <strong>tải lại</strong> — máy chủ không lưu gì.
+          <span id="history-count" class="muted">Đang gửi kèm: 0 lượt.</span>
         </p>
 
         <div id="messages" class="messages" aria-live="polite"></div>

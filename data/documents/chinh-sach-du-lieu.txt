@@ -1,0 +1,52 @@
+CHÍNH SÁCH QUẢN LÝ DỮ LIỆU NỘI BỘ
+
+1. PHẠM VI ÁP DỤNG
+
+Chính sách này áp dụng cho mọi tài liệu được nạp vào hệ thống hỏi đáp nội bộ, bao gồm
+tài liệu tải lên qua giao diện quản trị và tài liệu đặt sẵn trong thư mục nguồn. Chính
+sách không áp dụng cho dữ liệu nhật ký vận hành, vốn theo quy định lưu trữ riêng.
+
+2. PHÂN LOẠI TÀI LIỆU
+
+Tài liệu được chia làm ba mức. Mức công khai gồm tài liệu hướng dẫn sử dụng và câu hỏi
+thường gặp, không chứa thông tin nhạy cảm. Mức nội bộ gồm quy trình vận hành và tài
+liệu kiến trúc, chỉ lưu hành trong tổ chức. Mức hạn chế gồm tài liệu chứa thông tin cá
+nhân hoặc số liệu tài chính chưa công bố.
+
+Tài liệu mức hạn chế không được nạp vào hệ thống hỏi đáp cho tới khi có cơ chế phân
+quyền theo người dùng. Hiện tại hệ thống chưa có xác thực, nghĩa là bất kỳ ai truy cập
+được giao diện đều đọc được mọi đoạn văn đã nạp.
+
+3. THÔNG TIN CÁ NHÂN
+
+Không nạp tài liệu chứa số căn cước, số tài khoản ngân hàng, hồ sơ y tế, hoặc thông tin
+lương của cá nhân. Hồ sơ ứng viên và sơ yếu lý lịch thuộc nhóm này.
+
+Nếu phát hiện tài liệu vi phạm đã được nạp, xoá nguồn đó khỏi chỉ mục ngay qua giao
+diện quản trị. Lưu ý thao tác xoá chỉ gỡ các điểm vector khỏi chỉ mục, tệp gốc vẫn nằm
+trong thư mục tải lên và phải được xoá riêng.
+
+4. THỜI HẠN LƯU TRỮ
+
+Tài liệu hướng dẫn giữ cho tới khi có bản thay thế. Tài liệu quy trình rà soát mỗi sáu
+tháng, bản hết hiệu lực phải được gỡ khỏi chỉ mục vì một câu trả lời dẫn quy trình cũ
+còn tệ hơn không có câu trả lời nào.
+
+Bản sao lưu ổ đĩa vector giữ ba mươi ngày. Quá hạn này, khôi phục phải đi bằng đường
+nạp lại từ thư mục tài liệu nguồn.
+
+5. CHI PHÍ VÀ HẠN MỨC
+
+Mỗi lần nạp tài liệu đều phát sinh chi phí gọi dịch vụ sinh vector bên ngoài, tính theo
+tổng số ký tự được xử lý. Nạp lại toàn bộ kho tài liệu là thao tác tốn kém, nên tránh
+chạy lặp lại khi không cần thiết.
+
+Việc đổi mô hình sinh vector kéo theo bắt buộc nạp lại toàn bộ, vì số chiều vector thay
+đổi làm bộ sưu tập cũ không dùng được. Quyết định đổi mô hình phải được phê duyệt kèm
+ước tính chi phí nạp lại.
+
+6. TRÁCH NHIỆM
+
+Người nạp tài liệu chịu trách nhiệm phân loại đúng mức nhạy cảm trước khi nạp. Người
+quản trị hệ thống chịu trách nhiệm rà soát danh sách nguồn định kỳ và gỡ tài liệu hết
+hiệu lực. Mọi thay đổi chính sách phải được ghi lại kèm ngày và lý do.

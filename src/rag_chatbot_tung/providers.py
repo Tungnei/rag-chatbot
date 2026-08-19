@@ -7,10 +7,11 @@ configuration change. This module is the one place that knows which class each
 
 from __future__ import annotations
 
-from rag_chatbot_tung.adaptor import EmbeddingProvider, LLMProvider
+from rag_chatbot_tung.adaptor import EmbeddingProvider, LLMProvider, Reranker
 from rag_chatbot_tung.configs import Settings
 from rag_chatbot_tung.embeddings import OpenAIEmbedder
 from rag_chatbot_tung.llm_generator import AnthropicLLM, OpenAILLM
+from rag_chatbot_tung.rerank import NoopReranker
 
 _LLM_KEY_FIELDS = {"openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY"}
 
@@ -39,3 +40,27 @@ def build_embedder(settings: Settings) -> EmbeddingProvider:
     invalidate every vector already in the collection.
     """
     return OpenAIEmbedder(settings.embeddings, _require(settings.openai_api_key, "openai"))
+
+
+def build_reranker(settings: Settings) -> Reranker:
+    """Noop unless the operator opted into the heavy path.
+
+    The cross-encoder import stays inside this branch so the default install never
+    touches torch, and a missing extra is reported by name rather than as a bare
+    ModuleNotFoundError three frames deeper.
+    """
+    if settings.rerank.provider != "cross_encoder":
+        return NoopReranker()
+
+    from rag_chatbot_tung.rerank.cross_encoder import CrossEncoderReranker
+
+    try:
+        # Construction is what triggers the sentence_transformers import — the module
+        # above imports fine without it, since the heavy import is deliberately inside
+        # __init__ to keep `import rag_chatbot_tung.rerank` free of torch.
+        return CrossEncoderReranker(settings.rerank)
+    except ImportError as exc:
+        raise ValueError(
+            "rerank.provider is 'cross_encoder' but sentence-transformers is not "
+            "installed. Install the extra: uv sync --extra rerank"
+        ) from exc

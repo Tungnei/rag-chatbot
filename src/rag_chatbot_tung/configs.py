@@ -51,6 +51,10 @@ class LLMSettings(BaseModel):
     max_tokens: int = 2000
     timeout: int = 60
     context_token_budget: int = 6000
+    # History shares context_token_budget with the retrieved passages. Without a cap
+    # of its own, three long turns starve the passages and the answer degrades even
+    # when retrieval was perfect — which looks exactly like a retrieval bug.
+    history_token_budget: int = 1500
     # Anthropic only, and not accepted by every model (Sonnet 4.5 errors on it), so it
     # is sent only when set.
     effort: Literal["low", "medium", "high", "xhigh", "max"] | None = None
@@ -59,12 +63,33 @@ class LLMSettings(BaseModel):
 class RetrieverSettings(BaseModel):
     top_k: int = 3
     score_threshold: float = 0.3
+    # Off by default so this can merge without changing production behaviour; turning
+    # it back off is one variable rather than a revert.
+    hybrid: bool = False
+    dense_prefetch_limit: int = 30
+    sparse_prefetch_limit: int = 30
+    # Minimum BM25 score for a sparse-only hit to survive the post-fusion floor. None
+    # means "keep only what the thresholded dense prefetch already vouched for" — a
+    # hand-picked number here would be worse than no number at all.
+    sparse_score_floor: float | None = None
+    # How many fused candidates reach the reranker. Deliberately separate from
+    # top_k, which means "chunks the LLM gets" and must keep meaning only that.
+    fusion_limit: int = 30
 
 
 class ChunkingSettings(BaseModel):
     chunk_size: int = 1000
     chunk_overlap: int = 100
     min_chunk_size: int = 50
+
+
+class RerankSettings(BaseModel):
+    # noop keeps the fusion order and costs nothing; cross_encoder needs the
+    # `rerank` extra and a much larger image.
+    provider: Literal["noop", "cross_encoder"] = "noop"
+    model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    device: str = "cpu"
+    top_n: int = 10
 
 
 class APISettings(BaseModel):
@@ -95,6 +120,7 @@ class Settings(BaseSettings):
     embeddings: EmbeddingSettings = Field(default_factory=EmbeddingSettings)
     llm: LLMSettings = Field(default_factory=LLMSettings)
     retriever: RetrieverSettings = Field(default_factory=RetrieverSettings)
+    rerank: RerankSettings = Field(default_factory=RerankSettings)
     chunking: ChunkingSettings = Field(default_factory=ChunkingSettings)
     api: APISettings = Field(default_factory=APISettings)
     storage: StorageSettings = Field(default_factory=StorageSettings)

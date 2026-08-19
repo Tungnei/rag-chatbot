@@ -10,6 +10,13 @@
 
   var STORAGE_KEY = "rag-chat-params";
 
+  // Page memory only, deliberately never written to storage: persisting it would
+  // turn every stale assistant turn into long-lived input for the prompt. Pushed
+  // strictly in user+assistant pairs, so the length stays even and slice(-6)
+  // always starts on a user turn.
+  var history = [];
+  var MAX_HISTORY = 6;
+
   var form = document.getElementById("chat-form");
   var input = document.getElementById("question-input");
   var sendButton = document.getElementById("send-button");
@@ -19,6 +26,7 @@
   var topK = document.getElementById("top-k");
   var topKValue = document.getElementById("top-k-value");
   var includeSources = document.getElementById("include-sources");
+  var historyCount = document.getElementById("history-count");
 
   // Cards for whichever answer's sources the panel is currently showing. Never a
   // record of "the latest answer": each answer owns its own source list and clicking
@@ -188,6 +196,21 @@
     scrollToLatest();
   }
 
+  function rememberExchange(question, answer) {
+    history.push({ role: "user", content: question });
+    history.push({ role: "assistant", content: answer });
+    if (history.length > MAX_HISTORY) {
+      history = history.slice(-MAX_HISTORY);
+    }
+    updateHistoryCount();
+  }
+
+  function updateHistoryCount() {
+    if (historyCount) {
+      historyCount.textContent = "Đang gửi kèm: " + history.length / 2 + " lượt.";
+    }
+  }
+
   async function ask(question) {
     var skeleton = showSkeleton();
     // The textarea has to be disabled too, not just the button: requestSubmit() on
@@ -204,6 +227,7 @@
           question: question,
           top_k: Number(topK.value),
           include_sources: includeSources.checked,
+          history: history.slice(-MAX_HISTORY),
         }),
       });
 
@@ -215,7 +239,13 @@
         return;
       }
 
-      renderAnswer(await response.json());
+      var payload = await response.json();
+      renderAnswer(payload);
+      // Recorded only once a real answer exists, and as a pair. Pushing the user turn
+      // at submit time would leave an orphan behind whenever a request failed, and the
+      // next request would then carry a history ending on a user turn.
+      // A refusal still counts: the next turn needs to know this one found nothing.
+      rememberExchange(question, payload.answer);
     } catch (err) {
       skeleton.remove();
       // Reached when the API is unreachable — including the case where the server

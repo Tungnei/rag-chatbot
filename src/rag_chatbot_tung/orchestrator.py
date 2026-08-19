@@ -5,12 +5,12 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
-from rag_chatbot_tung.adaptor import EmbeddingProvider, LLMProvider, VectorStore
+from rag_chatbot_tung.adaptor import EmbeddingProvider, LLMProvider, Reranker, VectorStore
 from rag_chatbot_tung.chunking import TextSplitter
 from rag_chatbot_tung.configs import Settings
 from rag_chatbot_tung.llm_generator import NO_CONTEXT_ANSWER, build_rag_messages
 from rag_chatbot_tung.logging import get_logger
-from rag_chatbot_tung.providers import build_embedder, build_llm
+from rag_chatbot_tung.providers import build_embedder, build_llm, build_reranker
 from rag_chatbot_tung.retrieval import IngestionPipeline, QdrantVectorStore
 from rag_chatbot_tung.validate import (
     CollectionInfo,
@@ -36,11 +36,19 @@ class RAGOrchestrator:
         embedder: EmbeddingProvider | None = None,
         vector_store: VectorStore | None = None,
         llm: LLMProvider | None = None,
+        reranker: Reranker | None = None,
     ) -> None:
         self.settings = settings
         self.embedder = embedder or build_embedder(settings)
-        self.vector_store = vector_store or QdrantVectorStore(settings.qdrant)
+        self.vector_store = vector_store or QdrantVectorStore(
+            settings.qdrant, retriever=settings.retriever
+        )
         self.llm = llm or build_llm(settings)
+        self.reranker = reranker or build_reranker(settings)
+        # An injected reranker counts too. Deriving this from the setting alone would
+        # feed a directly-injected reranker only top_k candidates — it would reorder
+        # five into five and every test checking 'was it called' would still pass.
+        self._reranks = reranker is not None or settings.rerank.provider != "noop"
         self.pipeline = IngestionPipeline(
             self.embedder, self.vector_store, TextSplitter(settings.chunking)
         )
@@ -48,18 +56,54 @@ class RAGOrchestrator:
     def startup(self) -> None:
         self.vector_store.ensure_collection()
 
+    def _effective_top_n(self, top_k: int) -> int:
+        """top_k accepts up to 20 while rerank.top_n defaults to 10; never return less
+        than the caller asked for."""
+        return max(self.settings.rerank.top_n, top_k)
+
+    def retrieve(self, question: str, top_k: int) -> list[RetrievedChunk]:
+        """The single retrieval path. answer() and evaluate_retrieval() both call this.
+
+        Keeping one path is the point: the eval used to reimplement retrieval by
+        calling vector_store.search directly, so a new layer added to answer() would
+        never have been measured — the comparison table would print the same numbers
+        for every configuration.
+        """
+        # Fan out only when something will consume the extra candidates; with the
+        # default NoopReranker this stays exactly the phase-7 behaviour.
+        fan_out = self.settings.retriever.fusion_limit if self._reranks else top_k
+
+        chunks = self.vector_store.search(
+            self.embedder.embed_query(question),
+            top_k=fan_out,
+            score_threshold=self.settings.retriever.score_threshold,
+            # Only the BM25 branch reads this; the dense vector above is still built
+            # from the current question alone (DEC-2).
+            query_text=question,
+        )
+        if not chunks:
+            return []
+
+        # After the empty check, never before: running a model to hand back an empty
+        # list wastes time and weakens the empty-result guard.
+        chunks = self.reranker.rerank(question, chunks, self._effective_top_n(top_k))
+        return chunks[:top_k]
+
     def answer(self, request: QueryRequest) -> QueryResponse:
         started = time.perf_counter()
         top_k = request.top_k or self.settings.retriever.top_k
 
-        chunks = self.vector_store.search(
-            self.embedder.embed_query(request.question),
-            top_k=top_k,
-            score_threshold=self.settings.retriever.score_threshold,
-        )
+        chunks = self.retrieve(request.question, top_k)
 
         if not chunks:
-            logger.info("no chunks above threshold for question: %s", request.question[:80])
+            # history_turns is counted through the log, never through a field on
+            # self: RAGOrchestrator is a process-wide singleton, so a counter here
+            # would bleed across every request and every test sharing the fixture.
+            logger.info(
+                "no chunks above threshold (history_turns=%d) for question: %s",
+                len(request.history),
+                request.question[:80],
+            )
             return QueryResponse(
                 answer=NO_CONTEXT_ANSWER,
                 model=self.settings.llm.model,
@@ -70,7 +114,9 @@ class RAGOrchestrator:
             build_rag_messages(
                 request.question,
                 chunks,
+                request.history,
                 token_budget=self.settings.llm.context_token_budget,
+                history_budget=self.settings.llm.history_token_budget,
                 model=self.settings.llm.model,
             )
         )

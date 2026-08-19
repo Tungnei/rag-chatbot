@@ -12,6 +12,7 @@ from pypdf import PdfReader
 from rag_chatbot_tung.adaptor import EmbeddingProvider, VectorPoint, VectorStore
 from rag_chatbot_tung.chunking import TextSplitter
 from rag_chatbot_tung.logging import get_logger
+from rag_chatbot_tung.retrieval.sparse import encode as encode_sparse
 from rag_chatbot_tung.utils import clean_text
 from rag_chatbot_tung.validate import Chunk, SourceType
 
@@ -163,6 +164,7 @@ class IngestionPipeline:
                 id=str(uuid.uuid5(_POINT_NAMESPACE, f"{source}:{chunk.index}")),
                 vector=vector,
                 payload=chunk.model_dump(mode="json"),
+                sparse=encode_sparse(chunk.text),
             )
             for chunk, vector in zip(chunks, vectors, strict=True)
         ]

@@ -66,6 +66,18 @@ def away_from_dotenv(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
 
+@pytest.fixture(autouse=True)
+def never_reach_huggingface(monkeypatch):
+    """Second net under the offline rule.
+
+    NoopReranker being the default only keeps *other* tests away from the network; it
+    does nothing about a test that deliberately builds a cross-encoder. With these set,
+    such a slip fails loudly instead of quietly pulling ~90MB mid-suite.
+    """
+    monkeypatch.setenv("HF_HUB_OFFLINE", "1")
+    monkeypatch.setenv("TRANSFORMERS_OFFLINE", "1")
+
+
 @pytest.fixture
 def settings(tmp_path) -> Settings:
     s = Settings(openai_api_key="test-key")

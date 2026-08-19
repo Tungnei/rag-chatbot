@@ -57,6 +57,7 @@ def test_chat_page_has_required_hooks(client):
         "sources-panel",
         "top-k",
         "include-sources",
+        "history-notice",
     ):
         assert f'id="{element_id}"' in html
 
@@ -88,12 +89,35 @@ def test_no_static_asset_injects_markup():
             assert banned not in text, f"{asset.name} uses {banned}"
 
 
-def test_page_states_single_turn(client):
-    # The transcript looks like a chat, but the backend gets no history. Saying so is
-    # part of the contract with the user, so it gets a test rather than good intentions.
+def test_page_states_multi_turn_limit(client):
+    # What the page promises about memory is part of the contract with the user, so it
+    # gets a test rather than good intentions. The promise itself changed here: the bot
+    # now remembers, but only three exchanges and only inside this tab.
     html = client.get("/ui/").text
-    assert 'id="single-turn-notice"' in html
-    assert "không nhớ" in html
+    # Asserting the OLD notice is gone matters as much as asserting the new one exists:
+    # leaving both would still pass while the page contradicted itself.
+    assert 'id="single-turn-notice"' not in html
+    assert 'id="history-notice"' in html
+    assert "3 lượt" in html
+    assert "tải lại" in html
+
+
+def test_app_js_sends_history(client):
+    """String scan only: proves the two strings are present, not that the payload is
+    correct. No browser test here — adding Playwright would breach DEC-1."""
+    js = client.get("/ui/app.js").text
+    assert "history" in js
+    assert "slice(-6)" in js
+
+
+def test_app_js_does_not_persist_history(client):
+    """Green from the start: a safety line, not part of the red cycle.
+
+    History must stay in page memory. Persisting it would turn every stale assistant
+    turn into long-lived input for the prompt-poisoning path.
+    """
+    js = client.get("/ui/app.js").text
+    assert js.count("STORAGE_KEY") == 3
 
 
 def test_admin_page_served(client):

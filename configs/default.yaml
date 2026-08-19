@@ -20,11 +20,33 @@ llm:
   max_tokens: 2000
   timeout: 60
   context_token_budget: 6000
+  # Hard ceiling for conversation history so it cannot crowd out retrieved
+  # passages. Deliberately conservative: Vietnamese costs more tokens per
+  # character than English, and tiktoken only approximates Anthropic models.
+  history_token_budget: 1500
   # effort: low          # anthropic only, and not accepted by every Claude model
 
 retriever:
+  # Still "how many chunks the LLM gets". Phase 8 introduces a separate fan-out limit;
+  # do not overload this number with that job.
   top_k: 3
   score_threshold: 0.3
+  # Hybrid dense+BM25 retrieval, off by default so enabling it is one env variable.
+  hybrid: false
+  dense_prefetch_limit: 30
+  sparse_prefetch_limit: 30
+  # How many fused candidates reach the reranker. Separate from top_k on purpose:
+  # top_k means "chunks the LLM gets" and must keep meaning only that.
+  fusion_limit: 30
+  # sparse_score_floor: 0.0   # measure it from real BM25 scores before setting one
+
+rerank:
+  # noop keeps the fusion order and costs nothing. cross_encoder needs the
+  # `rerank` extra and a much larger image — use the runtime-rerank build target.
+  provider: noop          # noop | cross_encoder
+  model: cross-encoder/ms-marco-MiniLM-L-6-v2
+  device: cpu
+  top_n: 10
 
 chunking:
   chunk_size: 1000

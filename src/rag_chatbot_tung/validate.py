@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -53,10 +54,23 @@ class GenerationResult(BaseModel):
         return self.prompt_tokens + self.completion_tokens
 
 
+class Turn(BaseModel):
+    """One past exchange. `system` is deliberately not allowed: a client must not be
+    able to inject its own instructions into the prompt."""
+
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=4000)
+
+
 class QueryRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
     top_k: int | None = Field(default=None, ge=1, le=20)
     include_sources: bool = True
+    # The business limit is three exchanges (DEC-2), enforced by TRIMMING in
+    # build_rag_messages so an over-long history is answered rather than rejected.
+    # This cap is an abuse stop instead: without it a client could post 10k turns of
+    # 4k chars and have 40MB parsed into memory before we ever get to trim it.
+    history: list[Turn] = Field(default_factory=list, max_length=50)
 
 
 class QueryResponse(BaseModel):
