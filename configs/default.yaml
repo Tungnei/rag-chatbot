@@ -7,20 +7,62 @@ qdrant:
   distance: Cosine
 
 embeddings:
+  # openai only — Anthropic serves no embeddings API
+  provider: openai
   model: text-embedding-3-small
   batch_size: 100
   max_retries: 3
 
 llm:
+  provider: openai        # openai | anthropic
   model: gpt-4o-mini
-  temperature: 0.7
+  temperature: 0.7        # openai only; Claude models reject it
   max_tokens: 2000
   timeout: 60
   context_token_budget: 6000
+  # Hard ceiling for conversation history so it cannot crowd out retrieved
+  # passages. Deliberately conservative: Vietnamese costs more tokens per
+  # character than English, and tiktoken only approximates Anthropic models.
+  history_token_budget: 1500
+  # effort: low          # anthropic only, and not accepted by every Claude model
 
 retriever:
-  top_k: 3
+  # The chain of limits, in the order a query passes through them:
+  #   dense_prefetch_limit  30  candidates from the dense branch
+  #   sparse_prefetch_limit 30  candidates from the BM25 branch
+  #   fusion_limit          30  survivors of RRF, handed to the reranker
+  #   rerank.top_n          10  survivors of reranking, handed to metadata adjustment
+  #   top_k                  5  what the LLM finally receives
+  # top_k has exactly one meaning — the last line. Nothing else borrows it.
+  top_k: 5
   score_threshold: 0.3
+  # Hybrid dense+BM25 retrieval, off by default so enabling it is one env variable.
+  hybrid: false
+  dense_prefetch_limit: 30
+  sparse_prefetch_limit: 30
+  # How many fused candidates reach the reranker. Separate from top_k on purpose:
+  # top_k means "chunks the LLM gets" and must keep meaning only that.
+  fusion_limit: 30
+  # sparse_score_floor: 0.0   # measure it from real BM25 scores before setting one
+
+rerank:
+  # noop keeps the fusion order and costs nothing. cross_encoder needs the
+  # `rerank` extra and a much larger image — use the runtime-rerank build target.
+  provider: noop          # noop | cross_encoder
+  model: cross-encoder/ms-marco-MiniLM-L-6-v2
+  device: cpu
+  top_n: 10
+
+metadata_adjust:
+  # Off by default like the other part-B layers.
+  enabled: false
+  # One document can otherwise take every slot, so a question needing two
+  # sources compared against each other never gets both.
+  max_per_source: 2
+  merge_adjacent: true
+  # Added, not multiplied, and calibrated for the RRF scale (~0.25-1.0). A
+  # cross-encoder scores on unbounded logits where this would be invisible.
+  title_boost: 0.05
 
 chunking:
   chunk_size: 1000

@@ -32,3 +32,16 @@ htmlcov/
 !/data/embeddings/.gitkeep
 /data/uploads/
 /notebooks/.ipynb_checkpoints
+
+# Local-only compose overrides (machine-specific paths, CA bundles)
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# Harness runtime state: per-machine trace telemetry, not project content.
+.harness/state/
+# Lock file held while the backlog SSOT is written.
+docs/.backlog_register.lock
+# Migration snapshots record one machine's index at one moment; the script writes them
+# and reads them back on resume. They are operational state, not source.
+/data/eval/migration-snapshot-*.json
+/data/eval/migration-in-progress.json

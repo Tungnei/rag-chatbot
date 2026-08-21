@@ -1,0 +1,25 @@
+schema: plan-approval/v1
+plan: 260817-1100-p2-multiturn-hybrid
+plan_hash: 46c6d14e669a
+file_hashes:
+  plan.md: dfcf71dffcc3
+  phase-1-p1-acceptance.md: d870f8acd7f9
+  phase-10-eval-final-docs.md: 6a5da5008901
+  phase-2-eval-foundation.md: 8390ac89e815
+  phase-3-multiturn-core.md: 2fa47c61348d
+  phase-4-multiturn-ui.md: 608e3b8889ff
+  phase-5-dec2-evidence.md: 0b268be4ebf1
+  phase-6-collection-migration.md: d87f59208bdc
+  phase-7-bm25-fusion.md: b63944708b5d
+  phase-8-cross-encoder-rerank.md: 34d70088f510
+  phase-9-metadata-adjust.md: f6d0f6239cca
+  plan-graph.yaml: 89b2c951db11
+author: user:v.tungnt200@vinsmartfuture.tech
+reviewer: user:v.tungnt200@vinsmartfuture.tech
+verdict: APPROVED
+rationale: Nguoi dung duyet sau khi doc truc tiep plan.md + 10 phase file. Da ap 3
+  BLOCKER + 5 HIGH tu red-team; 10 MEDIUM/LOW day sang BACKLOG BL-001..BL-010. B2
+  vá bang san lien quan sau fusion theo lua chon cua nguoi dung. Chot cook voi --tdd,
+  tuan tu (khong --parallel).
+ts: '2026-08-18T04:19:17.312862+00:00'
+run_seq: null

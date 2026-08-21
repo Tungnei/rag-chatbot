@@ -1,0 +1,84 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P10",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-19T16:00:00+00:00",
+  "checks": [
+    {
+      "name": "tdd-red",
+      "status": "SKIP",
+      "detail": "N/A — phase do luong + tai lieu, khong dung src/ va tests/. Khong bia mot vong do de truong nay trong day du."
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 156 passed, khong giam.",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 52 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 34 source files"
+    },
+    {
+      "name": "contribution-table",
+      "status": "PASS",
+      "detail": "BANG DONG GOP TUNG TANG — n=45 case (38 co dap an, 7 lac de), k=5 EP TUONG MINH cho ca bon dong (H3), cung bo eval / cung collection / cung lan ingest. | Cau hinh | Hit-rate | MRR | p95 retrieval | false_pos | | Baseline dense | 97.37% | 0.721 | 3954ms | 4 | | +fusion | 100.00% | 0.847 | 3101ms | 4 | | +rerank | 97.37% | 0.839 | 3638ms | 4 | | +metadata | 100.00% | 0.845 | 4412ms | 4 |. Do them cau hinh ngoai bang nhung quyet dinh phu thuoc vao no: +metadata KHONG rerank -> hit 100.00%, MRR 0.844. p50 retrieval: 1007 / 1128 / 2021 / 2116 ms. abstain_rate = 42.86% o CA NAM cau hinh.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "per-case-movement",
+      "status": "PASS",
+      "detail": "Phan con so tong khong noi duoc, liet ke theo TEN: baseline->fusion: +1 ('Doi mo hinh sinh vector roi thi co phai lam lai gi khong?'), -0. fusion->rerank: +0, -1 ('Can bat nhung tien trinh nao va theo thu tu ra sao?'). rerank->metadata: +1 (DUNG case ma rerank vua lam mat), -0. KET LUAN: dong gop duy nhat do duoc cua metadata la va lai thiet hai cua rerank. Khi rerank tat, metadata khong con gi de va: MRR 0.847 -> 0.844, khong case nao doi chieu."
+    },
+    {
+      "name": "latency-end-to-end",
+      "status": "PASS",
+      "detail": "Do that qua POST /query (co goi LLM), n=6: p50 4768ms, p95 9976ms, min 2742, max 16290. Doi chieu voi p50 retrieval 1007ms cua cung cau hinh -> phan sinh cau tra loi chiem ~79% do tre nguoi dung cam nhan. GIOI HAN DA GHI: n=6 chu khong phai 45, va chi do cho cau hinh baseline. Do du bon dong end-to-end la 180 lan goi LLM (~2.5 gio va tien that) trong khi chenh lech giua cac tang nam duoi nhieu cua chinh LLM — nen bang dung p95 RETRIEVAL de so cac tang, va con so end-to-end de biet ty trong.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "top-k-live",
+      "status": "PASS",
+      "detail": "Xac nhan tren truy van that qua /query sau khi dong bo container: so nguon moi cau tra loi = [5,5,5,5,5,2], max = 5. Cong top_k=5 cua phase 9 dat."
+    },
+    {
+      "name": "image-size",
+      "status": "SKIP",
+      "detail": "KHONG DO DUOC, lan thu ba trong plan nay: docker daemon khong verify duoc chung chi registry ('python:3.11-slim-bookworm ... x509: certificate signed by unknown authority'). Da thu lai sau khi proxy phuc hoi — van hong, vi trust store cua DAEMON tach biet voi shell env va can sudo. SO CO THAT: image runtime hien tai 448MB (con so '~200MB' trong ban nhap la [ASSUMED] va SAI). Proxy do duoc cho chi phi rerank: .venv 275M -> 1.3G (+1.0GB) voi torch CPU-only. Target runtime-rerank CHUA TUNG DUOC BUILD — la code chua chay."
+    },
+    {
+      "name": "dec-recorded",
+      "status": "PASS",
+      "detail": "DEC-10 ghi qua decision_register.py --append-alloc: bang so day du, quyet dinh tung tang kem ly do BANG SO, va nguong xet lai theo khuon mau DEC-4. Chot: hybrid BAT, rerank TAT, metadata TAT."
+    },
+    {
+      "name": "docs-sync",
+      "status": "PASS",
+      "detail": "ARCHITECTURE.md: so do request flow co du sparse/fusion/san lien quan/rerank/metadata; muc Grounding strategy noi ro ngUONG NAM O DAU (trong prefetch dense, khong ap sau fusion) va them canh bao ve thang diem sources[].score; 'ba Protocol' -> 'bon'. system-architecture.md: 'ba typing.Protocol' -> 'bon', them muc 'Tang truy xuat — ba cong tac' voi chuoi gioi han. PROJECT_STRUCTURE.md: them rerank/, so test 156. code-standards.md: CHI sua con so baseline (156 passed) — khong them muc nao, dung pham vi phase quy dinh. QUICK_REFERENCE.md: bang cong tac, lenh eval kem canh bao phai ep --top-k, lenh migrate. SETUP.md: muc optional rerank + build target + ghim CPU torch. README.md: mo ta duong truy van moi + canh bao thang diem. Quet lai: khong con cau nao noi 'ba Protocol', '45 tests' hay '78 passed' ngoai ban ghi lich su cua BL-004 trong backlog.yaml."
+    }
+  ],
+  "verdict": "PASS_WITH_RISK",
+  "notes": [
+    "KET LUAN CUA CA PHAN B, bang so: chi MOT trong ba tang moi dang de bat. fusion tra ve +2.63 diem hit-rate va +0.126 MRR (+17.5%) voi gia +12% p50 va KHONG mot dependency nao. rerank lam xau di ca hai metric trong khi doi +1.0GB va +79% p50. metadata khong co dong gop doc lap — no chi va lai cai rerank lam hong. Ket luan 'tang X khong dang' la mot ket qua HOP LE: no dong mot cau hoi bang bang chung thay vi de no quay lai sau sau thang.",
+    "H3 DA DUOC AP DUNG VA NO QUAN TRONG: ep --top-k 5 giong nhau cho ca bon dong. Neu de mac dinh, dong baseline se lay k=5 trong khi cac moc so cua phase 2/5/6/7 deu do o k=3, ma hit-rate@5 >= hit-rate@3 theo dinh nghia — baseline se cao len ma khong tang nao dong gop, va phan dong gop cua fusion bi nen lai tuong ung. Bang se trong day du va sai.",
+    "false_positive = 4 va abstain_rate = 42.86% GIU NGUYEN qua ca nam cau hinh. Nghia la san lien quan sau fusion (B2) da lam dung viec cua no: bat BM25 khong lam thung lop chong bia. Dong thoi no cung nghia la khong tang nao trong plan nay cai thien duoc grounding — 4/7 cau lac de van tra ve chunk, dung nhu baseline dense tu dau (BL-014).",
+    "hit-rate GIO DA KICH TRAN HOAN TOAN (100% sau fusion). Bat ky danh gia nao ve sau KHONG the dung no de phan biet cac tang. MRR va false_positive la hai cot con dung duoc. Da ghi vao DEC-10 va BL-013.",
+    "verdict PASS_WITH_RISK, khong phai PASS: bang thieu dung mot cot ma phase yeu cau — image size cho runtime-rerank — va no thieu vi mot chuong ngai ha tang co that (docker daemon thieu root CA, can sudo), khong phai vi bi bo qua. Cot p95 dung so RETRIEVAL cho bon dong va so END-TO-END chi cho mot dong voi n=6; ca hai gioi han deu duoc ghi thang trong check.",
+    "Con lai cho nguoi dung: (1) push hai commit (proxy da phuc hoi, lenh da ghi o cuoi); (2) neu muon do image size that thi phai cai root CA cho docker daemon (can sudo) roi chay docker build --target runtime va --target runtime-rerank; (3) nghiem thu tay muc 'hoi mot cau can doi chieu hai tai lieu' cua phase 9 van chua chay."
+  ],
+  "run_seq": null
+}

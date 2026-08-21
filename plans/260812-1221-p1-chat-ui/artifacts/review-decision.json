@@ -1,0 +1,101 @@
+{
+  "schema": "review-decision/v1",
+  "plan": "260812-1221-p1-chat-ui",
+  "stage": "cook-final",
+  "reviewer": "agent:hs:code-reviewer",
+  "reviewer_engine": "claude",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-12T12:22:00+00:00",
+  "scope": "git diff ae7e71b..a63f54c on branch feat/ui-chat-static",
+  "verdict": "PASS_WITH_FIXES",
+  "findings_total": 10,
+  "findings_fixed": 8,
+  "findings_accepted": 2,
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "high",
+      "file": "src/rag_chatbot/api/static/app.js",
+      "summary": "sourceCards là mảng cấp module bị ghi đè mỗi câu trả lời; nút [n] của câu cũ vẫn trỏ vào mảng hiện tại nên trích dẫn cũ nhảy sang nguồn của câu khác",
+      "status": "fixed",
+      "fix": "Mỗi câu trả lời đóng gói (closure) danh sách nguồn của chính nó; bấm [n] vẽ lại panel từ danh sách đó rồi mới highlight."
+    },
+    {
+      "id": "F2",
+      "severity": "high",
+      "file": "src/rag_chatbot/retrieval/vector_search.py",
+      "summary": "SourceType(payload.get('source_type','text')) ném ValueError với giá trị lạ hoặc null — một điểm hỏng làm sập cả endpoint /documents (500)",
+      "status": "fixed",
+      "fix": "_coerce_source_type() kiểm isinstance rồi bắt ValueError, rơi về SourceType.TEXT và ghi log. Có test test_list_sources_survives_unknown_source_type."
+    },
+    {
+      "id": "F3",
+      "severity": "medium",
+      "file": "src/rag_chatbot/retrieval/vector_search.py",
+      "summary": "title lấy từ chunk nào sắp trước theo point id — với markdown đó là một heading giữa tài liệu, không phải tên tài liệu",
+      "status": "fixed",
+      "fix": "Thêm 'index' vào with_payload; chỉ gán title khi index == 0. Nhánh backfill cũ (chỉ gán được None) đã bỏ. Có test test_list_sources_title_comes_from_the_first_chunk."
+    },
+    {
+      "id": "F4",
+      "severity": "medium",
+      "file": "src/rag_chatbot/api/static/app.js",
+      "summary": "requestSubmit() khi nhấn Enter vượt qua sendButton.disabled, cho phép hai lệnh /query chồng nhau và trả về lệch thứ tự",
+      "status": "fixed",
+      "fix": "Khoá luôn textarea trong try/finally của ask()."
+    },
+    {
+      "id": "F5",
+      "severity": "medium",
+      "file": "src/rag_chatbot/api/routes.py",
+      "summary": "GET /documents không auth + CORS '*' cho phép mọi trang web đọc trọn danh mục tên tài liệu đã index",
+      "status": "accepted",
+      "rationale": "Đã biết và đã ghi trước khi review: risk R9 trong plan và DEC-4. DEC-3 khoá rằng P1 không đổi CORS và không đổi port binding — sửa ở đây là lật một quyết định đã chốt. P3 phải xếp GET /documents vào nhóm admin cùng /ingest* và DELETE /documents. Reviewer cũng tự hiệu chỉnh: POST /query vốn đã đọc được cross-origin qua cùng lỗ hổng CORS, nên đây là mở rộng mức độ chứ không phải một lớp phơi nhiễm mới."
+    },
+    {
+      "id": "F6",
+      "severity": "medium",
+      "file": "src/rag_chatbot/api/static/admin/index.html",
+      "summary": "Lời hướng dẫn form xoá sai sự thật (nguồn URL VẪN nằm trong danh sách), và admin.js báo 'đã xoá' cho lệnh không khớp gì vì DELETE luôn trả 204",
+      "status": "fixed",
+      "fix": "Viết lại lời hướng dẫn; removeSource() đối chiếu tên với danh sách trước khi xoá và kiểm lại sau khi refresh."
+    },
+    {
+      "id": "F7",
+      "severity": "medium",
+      "file": "tests/test_ui.py",
+      "summary": "Quét chuỗi cấm chỉ áp lên hai đường dẫn cứng nên file JS thêm sau sẽ lọt; danh sách cấm thiếu setAttribute('on...), javascript:, new Function(, srcdoc; file HTML không được quét",
+      "status": "fixed",
+      "fix": "test_no_static_asset_injects_markup duyệt STATIC_DIR.rglob cho cả .js và .html, danh sách cấm mở rộng lên 11 mục, kèm assert số file tối thiểu để vòng lặp không chạy rỗng. Test redirect cũng sửa để thực sự quan sát 307."
+    },
+    {
+      "id": "F8",
+      "severity": "medium",
+      "file": "src/rag_chatbot/api/static/admin/admin.js",
+      "summary": "refresh() không có hàng rào in-flight nên phản hồi cũ ghi đè danh sách mới; đường lỗi để lại dữ liệu cũ dưới thông báo lỗi",
+      "status": "fixed",
+      "fix": "Thêm refreshTicket; phản hồi mang vé cũ bị bỏ. clearListing() xoá cả danh sách lẫn số đếm trên mọi đường lỗi."
+    },
+    {
+      "id": "F9",
+      "severity": "low",
+      "file": "src/rag_chatbot/retrieval/vector_search.py",
+      "summary": "GET /documents duyệt toàn bộ collection mỗi lần gọi, route đồng bộ chiếm threadpool, không cache không giới hạn",
+      "status": "accepted",
+      "rationale": "Chính là risk R7 đã ghi trong plan, kèm điều kiện đổi sang facet: points_count vượt ~50.000 VÀ đã đo độ trễ thật. Góc nhìn threadpool 40 slot của reviewer sắc hơn những gì plan viết và đã được ghi lại cho P3. Không tối ưu mù ở P1."
+    },
+    {
+      "id": "F10",
+      "severity": "medium",
+      "file": "src/rag_chatbot/retrieval/vector_search.py",
+      "summary": "payload.get('source','unknown') tạo ra tài liệu ma tên 'unknown' mà nút xoá không bao giờ xoá được",
+      "status": "fixed",
+      "fix": "Bỏ qua điểm không có source và ghi log. Có test test_list_sources_skips_points_without_source."
+    }
+  ],
+  "notes": [
+    "Reviewer tự xác minh bằng probe script chứ không chỉ đọc: dựng lại được F2, F3, F5, F9.",
+    "Reviewer đọc local_collection._scroll_by_id và kết luận vòng phân trang là ĐÚNG — offset inclusive, next_page_offset là id bản ghi chưa trả đầu tiên, không sót không đếm trùng. Không có finding ở đó.",
+    "Sau sửa: 63 test xanh (60 + 3 test mới cho F2/F3/F10), ruff + black + mypy sạch."
+  ]
+}

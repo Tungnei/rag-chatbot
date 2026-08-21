@@ -5,11 +5,11 @@ import hashlib
 import pytest
 from qdrant_client import QdrantClient
 
-from rag_chatbot_tung.chunking import TextSplitter
-from rag_chatbot_tung.configs import Settings
-from rag_chatbot_tung.orchestrator import RAGOrchestrator
-from rag_chatbot_tung.retrieval import IngestionPipeline, QdrantVectorStore
-from rag_chatbot_tung.validate import GenerationResult
+from rag_chatbot.chunking import TextSplitter
+from rag_chatbot.configs import Settings
+from rag_chatbot.orchestrator import RAGOrchestrator
+from rag_chatbot.retrieval import IngestionPipeline, QdrantVectorStore
+from rag_chatbot.validate import GenerationResult
 
 VECTOR_SIZE = 16
 
@@ -51,6 +51,31 @@ class FakeLLM:
 
     def health(self) -> bool:
         return True
+
+
+@pytest.fixture(autouse=True)
+def away_from_dotenv(tmp_path, monkeypatch):
+    """Run every test somewhere without a .env file.
+
+    `Settings` resolves `env_file=".env"` against the working directory, and .env
+    outranks both the YAML layer and the field defaults. Run from the repo root by
+    anyone who followed the README and copied .env.example, and the suite reads that
+    developer's settings instead of the ones under test — the suite goes red on a
+    correct machine, and which tests fail depends on what happens to be in their .env.
+    """
+    monkeypatch.chdir(tmp_path)
+
+
+@pytest.fixture(autouse=True)
+def never_reach_huggingface(monkeypatch):
+    """Second net under the offline rule.
+
+    NoopReranker being the default only keeps *other* tests away from the network; it
+    does nothing about a test that deliberately builds a cross-encoder. With these set,
+    such a slip fails loudly instead of quietly pulling ~90MB mid-suite.
+    """
+    monkeypatch.setenv("HF_HUB_OFFLINE", "1")
+    monkeypatch.setenv("TRANSFORMERS_OFFLINE", "1")
 
 
 @pytest.fixture

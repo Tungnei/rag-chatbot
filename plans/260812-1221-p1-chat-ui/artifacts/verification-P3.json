@@ -1,0 +1,51 @@
+{
+  "stage": "phase",
+  "plan": "260812-1221-p1-chat-ui",
+  "phase": "P3",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-12T11:26:00+00:00",
+  "checks": [
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 52 passed (48 + 4 test trang chat)",
+      "format": "manual"
+    },
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "Trước implement: 3 failed (hooks, static assets, single-turn notice). test_app_js_never_uses_innerhtml xanh giả vì app.js còn 404 — chỉ có nghĩa sau khi file tồn tại."
+    },
+    {
+      "name": "xss-guard",
+      "status": "PASS",
+      "detail": "Test cấm chuỗi đã bắt thật: lần chạy đầu FAIL vì comment trong app.js có chữ innerHTML. Sửa comment, không nới test."
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check -> 38 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 27 files"
+    },
+    {
+      "name": "manual-acceptance",
+      "status": "SKIP",
+      "detail": "HOÃN, chưa chạy: cần Qdrant server nên cần docker pull, mà daemon chưa có root CA Vingroup (cần sudo). Gom về cuối cook cùng nghiệm thu phase 5 và smoke phase 6."
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "Trích dẫn [n] vượt số nguồn được render thành chữ thường, không tạo nút — xử đúng trường hợp model trích [4] khi chỉ có 3 đoạn.",
+    "Mọi node DOM dựng bằng createElement + textContent; xoá panel bằng replaceChildren().",
+    "verdict PASS chỉ phủ phần đo bằng máy; nghiệm thu thủ công vẫn nợ và đã ghi ở check manual-acceptance."
+  ]
+}

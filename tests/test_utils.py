@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from rag_chatbot_tung.utils import (
+from rag_chatbot.utils import (
     clean_text,
     count_tokens,
     normalize_whitespace,

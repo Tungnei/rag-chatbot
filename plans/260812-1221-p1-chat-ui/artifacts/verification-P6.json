@@ -1,0 +1,62 @@
+{
+  "stage": "phase",
+  "plan": "260812-1221-p1-chat-ui",
+  "phase": "P6",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-12T12:26:00+00:00",
+  "checks": [
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 63 passed (60 + 3 test mới sinh ra từ review)",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check -> 38 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 27 files"
+    },
+    {
+      "name": "docs",
+      "status": "PASS",
+      "detail": "README (UI + GET /documents + cảnh báo no-auth), QUICK_REFERENCE (bảng URL), PROJECT_STRUCTURE (cây static + Key types), SETUP (hành vi R1), ARCHITECTURE (module + list_sources). Đã sửa một fence markdown bị chèn hỏng trong ARCHITECTURE."
+    },
+    {
+      "name": "wheel-packaging",
+      "status": "PASS",
+      "detail": "uv build --wheel: cả 5 file tĩnh nằm trong rag_chatbot/api/static/. R3 khép lại — cả đường /app/src lẫn đường site-packages đều có file."
+    },
+    {
+      "name": "independent-review",
+      "status": "PASS",
+      "detail": "@code-reviewer: 10 finding, 8 sửa, 2 chấp nhận có lý do. Xem review-decision.json."
+    },
+    {
+      "name": "container-smoke",
+      "status": "PASS",
+      "detail": "ĐÃ CHẠY THẬT trong container (docker compose, cổng host 8001 -> 8000): /ui 200, /ui/admin 200, /ui/app.js 200, /ui/admin/admin.js 200, /docs 200, /ui không -L trả 307 đúng như tài liệu. health {qdrant:true, openai:false}, collections points_count 0, documents total 0. Container báo (healthy)."
+    },
+    {
+      "name": "manual-acceptance",
+      "status": "SKIP",
+      "detail": "CHƯA CHẠY: nghiệm thu thủ công phase 3 và 5 cần Qdrant server, chặn bởi cùng lý do."
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "PASS này chỉ phủ phần đo được bằng máy. Hai hạng mục SKIP là bằng chứng còn nợ, không phải đã bỏ.",
+    "Plan chưa được đóng (close_plan.py) vì acceptance toàn plan còn hai dòng chưa tick: smoke container và nghiệm thu thủ công.",
+    "Cập nhật 2026-08-13: smoke container đã chạy và đạt, R3 khép lại hoàn toàn. Trên đường tới đó phát hiện và sửa một lỗi cấu hình trong docker-compose.yaml: ports 8001:8000 nhưng API__PORT lại đặt 8001, nên không có gì nghe ở cổng 8000 trong container và HEALTHCHECK của Dockerfile (localhost:8000) cũng hỏng theo.",
+    "Còn nợ duy nhất: nghiệm thu thủ công trên trình duyệt (phase 3 và 5) — cần OPENAI_API_KEY thật."
+  ]
+}

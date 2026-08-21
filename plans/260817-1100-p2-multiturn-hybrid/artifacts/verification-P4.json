@@ -1,0 +1,67 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P4",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-18T09:30:00+00:00",
+  "checks": [
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "3 test do vi ly do nghiep vu: assert 'id=\"single-turn-notice\"' not in html (trang van hua dieu cu); assert 'id=\"history-notice\"' in html (chua ton tai); assert 'history' in app.js (app.js con gui 3 truong). test_app_js_does_not_persist_history XANH TU DAU — day bao hiem, khong tinh vao vong do (da ghi trong docstring)."
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 111 passed (109 -> 111).",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 44 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 29 files"
+    },
+    {
+      "name": "test-rewritten-not-deleted",
+      "status": "PASS",
+      "detail": "RUI RO LON NHAT CUA PHASE, da kiem bang so: test_page_states_single_turn -> DOI TEN thanh test_page_states_multi_turn_limit voi khang dinh nguoc lai, KHONG xoa. git diff --stat tests/test_ui.py = 29 insertions / 5 deletions; so ham test 11 -> 13 (tang, khong giam). grep -c single-turn-notice index.html = 0."
+    },
+    {
+      "name": "xss-guard",
+      "status": "PASS",
+      "detail": "test_no_static_asset_injects_markup van xanh sau khi sua app.js/index.html. Comment moi ve history da duoc viet tranh moi chuoi trong BANNED_MARKUP — bai hoc tu P1 verification-P3 (lan do dau vi comment chua chu innerHTML). History render qua textContent nhu addMessage dang lam."
+    },
+    {
+      "name": "integration",
+      "status": "PASS",
+      "detail": "DA CHAY THAT tren stack song (:8001) sau khi dong bo ma nguon vao container. (1) Hoi 'khoi dong moi truong phat trien can bat gi va theo thu tu nao' -> tra loi dung tu huong-dan-van-hanh.md. (2) Hoi tiep 'Neu NO chua san sang vao luc do thi sao?' KEM history -> giai dung 'no' = kho vector, tra loi mach lac [2]. (3) CHUNG MINH history toi duoc model: hoi 'Cau hoi ngay truoc do toi da hoi ve chu de gi?' KEM history -> tra dung 'chinh sach sao luu du lieu'; KHONG kem history -> NO_CONTEXT_ANSWER. Doi chung sach. (4) 12 turn -> HTTP 200 (cat chu khong tu choi). (5) role='system' -> HTTP 422.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "manual-browser",
+      "status": "SKIP",
+      "detail": "Cac muc CHI trinh duyet moi kiem duoc, chua chay: chi bao so luot tang dan va dung o 3; tai lai trang -> hoi thoai trong va history:[]; tat Qdrant -> loi hien ra va history KHONG tang; xem payload trong DevTools Network. Co che da xac minh tinh trong ma (day theo cap sau renderAnswer, hai nhanh loi khong day gi, updateHistoryCount cap nhat textContent) nhung hanh vi that can nguoi bam."
+    }
+  ],
+  "verdict": "PASS_WITH_RISK",
+  "notes": [
+    "KHONG rebuild duoc image: `docker compose build api` that bai o buoc keo python:3.11-slim-bookworm — 'tls: failed to verify certificate: x509: certificate signed by unknown authority'. Day DUNG LA chuong ngai ma P1 da ghi (docker daemon chua co root CA Vingroup, can sudo); docker-compose.override.yml chi tiem CA vao CONTAINER, khong vao daemon keo base image. Cach di vong da dung: docker cp ma nguon vao container roi `docker compose restart api` (restart GIU lop ghi cua container; --force-recreate se xoa sach). HE QUA: deployment hien tai la ban va tay, KHONG tai lap duoc tu image. Muon dung nghia phai sua CA cho daemon (can sudo).",
+    "QUAN SAT DANG CHU Y cho phase 5: chay doi chung 'Neu no chua san sang thi sao?' CO history va KHONG history cho CUNG MOT cau tra loi — vi doan van duoc truy xuat da tu chua cau tra loi, bat ke dai tu. Nghia la o nhung case nhu vay history KHONG tao ra khac biet do duoc. Day la du bao som rang tac dong cua dai tu co the NHO hon gia dinh, va no la chinh xac dieu phase 5 sinh ra de do bang 12 case chu khong phai bang cam nhan.",
+    "Tai lieu tieng Viet moi (phase 2) co tinh KHONG neu ten cong nghe cu the — chung noi 'kho vector' thay vi 'Qdrant'. Do la he qua cua rang buoc 'viet cau hoi bang loi nguoi dung, khong lam ro ri dap an qua tu khoa'. Tac dung phu: cau hoi kieu 'he thong dung co so du lieu nao' bi tra NO_CONTEXT_ANSWER du retrieval dung 5 chunk lien quan. Voi muc dich DO RETRIEVAL thi khong sao (hit-rate do nguon, khong do noi dung), nhung dung doc nham no la loi retrieval.",
+    "history KHONG duoc dua vao localStorage (test giu STORAGE_KEY dung 3 lan). Chi topK va includeSources con luu.",
+    "Day theo CAP sau renderAnswer, hai nhanh loi (!response.ok va catch) khong day gi — nen khong co turn user mo coi, va do dai history luon chan nen slice(-6) luon bat dau bang mot turn user.",
+    "NO_CONTEXT_ANSWER VAN duoc ghi vao history dung theo dac ta: no la mot cau tra loi that cua he thong."
+  ],
+  "run_seq": null
+}

@@ -1,0 +1,62 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P1",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-18T05:10:00+00:00",
+  "checks": [
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 78 passed, 2 warnings. Khop docs/code-standards.md:17. Phase khong viet code nen con so khong doi.",
+      "format": "manual"
+    },
+    {
+      "name": "tdd-red",
+      "status": "SKIP",
+      "detail": "N/A — phase khong viet mot dong code san pham nao. Khong co code moi thi khong co test moi, va ghi 'PASS' o day se lam hong y nghia truong tdd-red trong ca chuoi verification."
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 43 files would be left unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> Success: no issues found in 29 source files"
+    },
+    {
+      "name": "manual",
+      "status": "PASS",
+      "detail": "11/12 dong nghiem thu co ket qua that tren stack song (qdrant :6333 + api :8001, OPENAI_API_KEY that, 7 diem trong collection). CHAT /ui: A1 cau hoi co dap an -> tra loi dung, trich [1], 1 nguon score 0.6463, tokens 337, latency 52165ms. A3 top_k=10 -> 7 nguon (het so diem), page=1/2 co gia tri; lan dau chi 1 nguon la do corpus 7 diem chu khong phai loi. A4 include_sources=false -> answer 147 ky tu, sources=[]. A5 cau lac de -> dung chuoi NO_CONTEXT_ANSWER, sources=[]. A6 tat qdrant sau khi app chay -> /health degraded qdrant:false, /query 500 trong 1s (khong treo), bat lai phuc hoi 2s, du 7 diem. A7 nap .txt chua <img src=x onerror=alert(1)> -> chuoi ve nguyen dang chu trong snippet; app.js 0 lan innerHTML, chi textContent/createTextNode (app.js:147). A8 nhan mot-luot: test_page_states_single_turn xanh, index.html:17-20 phuc vu that. ADMIN /ui/admin: B9 upload -> chunks_indexed=1, points_count 7->8, hien trong danh sach. B10 xoa -> HTTP 204, points_count 8->7, bien khoi danh sach. B11 danh sach doc tu index that (GET /documents di qua vector store, khong phai localStorage). B12 canh bao khong-auth: test_admin_page_warns_no_auth xanh, admin/index.html:16 phuc vu that.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "manual-browser-click-pending",
+      "status": "SKIP",
+      "detail": "1/12 dong CHUA chay: A2 bam [1] -> panel cuon toi va lam noi nguon 1. Co che da xac minh tinh trong ma (app.js:70-78 highlight() toggle class 'active' + scrollIntoView smooth) nhung KHONG co cach nao chung minh cu bam that ma khong co trinh duyet. Nguoi quyet dinh di tiep: user:v.tungnt200@vinsmartfuture.tech ('tiep tuc', 2026-08-18). Day la deferral CO Y THUC cua nguoi dung, khong phai cook tu ghi SKIP."
+    }
+  ],
+  "verdict": "PASS_WITH_RISK",
+  "notes": [
+    "PHAT HIEN 2 LOI THAT (dung muc dich cua phase). BL-011: /health tra openai:true voi API key DA CHET — OpenAILLM.health() (openai_llm.py:36-46) goi models.list(), ma OpenRouter phuc vu GET /v1/models khong can auth [OBSERVED: key rac 'sk-or-v1-totally-invalid-key-for-testing' -> 413 models tra ve]. Da chung kien truc tiep: health xanh trong khi moi POST /query tra 500.",
+    "BL-012: orchestrator.health() (orchestrator.py:113-121) chi goi vector_store.health() va llm.health(), KHONG BAO GIO goi embedder.health(). EmbeddingProvider.health() khai bao o protocols.py:32 va cai dat o openai_embedder.py:45-51 nhung la dead code o production. Embeddings dung la nua bi hong.",
+    "Doi xung dang chu y: nua qdrant cua /health hoat dong dung (qdrant:false khi tat that); chi nua openai la vo nghia.",
+    "KHONG va loi trong phase nay — phase file yeu cau xu ly nhu viec P1 rieng. Da dang ky BL-011 + BL-012.",
+    "DO DUOC, anh huong phase sau: latency 52165ms/truy van qua TLS-proxy + OpenRouter. Phase 2 dung >=40 case va phase 10 chay 4 lan -> ~35 phut/dong, ~2.5 gio cho bang phase 10. Can biet truoc khi phase 2 chon co bo eval (R12 canh bao ton tien that).",
+    ".env dang override retriever.top_k=5 va score_threshold=0.2, khac configs/default.yaml (3 / 0.3). Doi mac dinh 3->5 cua phase 9 THUC TE da la thiet lap dang chay cua nguoi dung.",
+    "data/uploads/ da co 2 PDF that chua duoc index (Checkpoint VPN guideline, KB_SAP_PnL_VinMotion) — lam nhe rui ro R11 ve nguon .pdf phai do nguoi dung cung cap.",
+    "DELETE /documents xoa vector nhung DE LAI file trong data/uploads/. File mo coi tich luy; nhung cung co nghia buoc doi chieu nguon cua phase 6 (R8) se tim thay nhieu nguon tren dia hon du kien.",
+    "Trang thai he thong da tra ve dung nhu truoc khi nghiem thu: 7 diem, 2 nguon, khong con artifact thu nghiem nao.",
+    "verdict PASS_WITH_RISK chu khong phai PASS: 11/12 dong da chay that va dat, nhung A2 con no va hai loi BL-011/BL-012 van chua sua.",
+    "CONG PHASE 1 -> PHASE 2: phase file yeu cau 'phase 2 KHONG duoc bat dau cho toi khi loi duoc xu ly HOAC duoc chap nhan co y thuc bang mot ghi chu'. Cook da bao cao BL-011 + BL-012 kem khuyen nghi sua truoc phase 2; nguoi dung tra loi 'tiep tuc' (2026-08-18). Ghi nhan day la CHAP NHAN CO Y THUC: hai loi van MO, khong sua trong plan nay, va phase 2 duoc phep bat dau. Nguoi quyet dinh: user:v.tungnt200@vinsmartfuture.tech. Rui ro con lai: phase 2/5/10 do bang ha tang that, mot lan key chet se hien ra nhu 'retrieval kem' chu khong phai loi credential."
+  ],
+  "run_seq": null
+}

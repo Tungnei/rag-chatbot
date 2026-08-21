@@ -1,5 +1,5 @@
 [project]
-name = "rag-chatbot-tung"
+name = "rag-chatbot"
 version = "0.1.0"
 description = "A Retrieval Augmented Generation chatbot for intelligent document Q&A"
 readme = "README.md"
@@ -21,16 +21,20 @@ dependencies = [
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
     "python-dotenv>=1.0.0",
+    "anthropic>=0.40.0",
 ]
 
 [project.optional-dependencies]
+# Opt-in only. Pulls in torch, which dwarfs everything else here — the cost is paid by
+# whoever turns reranking on, not by every install of a feature that ships disabled.
+rerank = ["sentence-transformers>=3.0", "torch>=2.0"]
 jupyter = [
     "jupyter>=1.0.0",
     "ipykernel>=6.0.0",
 ]
 
 [project.scripts]
-rag-chatbot-tung = "rag_chatbot_tung:main"
+rag-chatbot = "rag_chatbot:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
@@ -64,3 +68,15 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+
+# torch defaults to the CUDA build, which drags in the whole nvidia toolkit — several
+# gigabytes of GPU runtime for a reranker this project runs with device: cpu. Pinning
+# the CPU wheel index keeps the optional extra to something an operator can actually
+# install, and matches what rerank.device is set to.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

@@ -1,0 +1,268 @@
+{
+  "total": 12,
+  "scored": 12,
+  "hits": 10,
+  "hit_rate": 0.8333333333333334,
+  "mrr": 0.6666666666666666,
+  "abstain_correct": 0,
+  "false_positive": 0,
+  "abstain_rate": 0.0,
+  "results": [
+    {
+      "case_id": "Nó lưu dữ liệu ở đâu?",
+      "question": "Hệ thống lưu vector ở đâu và trong bộ sưu tập tên gì?",
+      "expected_source": "sample_faq.txt",
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.5410273,
+        0.48304537,
+        0.47486952,
+        0.4451837,
+        0.43839717
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "case_id": "Vậy còn khi nó không tìm thấy gì thì sao?",
+      "question": "Khi không truy xuất được đoạn văn nào phù hợp thì hệ thống trả lời thế nào?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.6614532,
+        0.64730895,
+        0.56600684,
+        0.48817825,
+        0.48494577
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md"
+      ]
+    },
+    {
+      "case_id": "Cái đó tốn tiền ở chỗ nào?",
+      "question": "Chi phí khi nạp tài liệu phát sinh chủ yếu ở bước nào?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.5816135,
+        0.5668799,
+        0.53859425,
+        0.50432146,
+        0.4742683
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt",
+        "kien-truc-he-thong.md"
+      ]
+    },
+    {
+      "case_id": "Thế nó có xoá luôn tệp gốc không?",
+      "question": "Xoá một nguồn khỏi chỉ mục thì tệp gốc trong thư mục tải lên có bị xoá theo không?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.63223374,
+        0.5732147,
+        0.54036355,
+        0.5103376,
+        0.4616245
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "case_id": "Tại sao lại như vậy?",
+      "question": "Vì sao điểm cuối kiểm tra tình trạng báo tốt trong khi mọi truy vấn đều hỏng?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.6039487,
+        0.5317764,
+        0.5123533,
+        0.5071027,
+        0.48038208
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "case_id": "Giải thích rõ hơn phần đó đi.",
+      "question": "Bộ chia đoạn xử lý tệp Markdown khác tệp văn bản thường như thế nào?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.6676991,
+        0.4710425,
+        0.44136927,
+        0.41457054,
+        0.37111574
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md",
+        "chinh-sach-du-lieu.txt",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "case_id": "Giữ được bao lâu?",
+      "question": "Bản sao lưu ổ đĩa vector được giữ trong thời hạn bao lâu?",
+      "expected_source": "chinh-sach-du-lieu.txt",
+      "hit": true,
+      "rank": 2,
+      "scores": [
+        0.62335634,
+        0.5511661,
+        0.4916497,
+        0.4748,
+        0.4645647
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "kien-truc-he-thong.md",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "case_id": "Phải làm gì để nó có hiệu lực?",
+      "question": "Vì sao sửa tệp môi trường rồi khởi động lại container mà giá trị mới vẫn không được nạp?",
+      "expected_source": "huong-dan-van-hanh.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.664581,
+        0.5470097,
+        0.50146174,
+        0.48461464,
+        0.46463257
+      ],
+      "sources": [
+        "huong-dan-van-hanh.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md",
+        "kien-truc-he-thong.md",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "case_id": "Cái nào thắng?",
+      "question": "Giữa biến môi trường và tệp cấu hình YAML thì nguồn nào có mức ưu tiên cao hơn?",
+      "expected_source": "kien-truc-he-thong.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.60295945,
+        0.45998836,
+        0.4519331,
+        0.4187799,
+        0.4114435
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt",
+        "huong-dan-van-hanh.md",
+        "chinh-sach-du-lieu.txt"
+      ]
+    },
+    {
+      "case_id": "Nghi ngờ gì đầu tiên?",
+      "question": "Khi mọi câu hỏi đều nhận về câu từ chối thì nên kiểm tra nguyên nhân nào trước?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.6191161,
+        0.5393846,
+        0.51293725,
+        0.4906422,
+        0.48586774
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "huong-dan-van-hanh.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "case_id": "Nó có làm mất context không?",
+      "question": "Chia đoạn nhỏ hơn ảnh hưởng thế nào tới độ chính xác và ngữ cảnh xung quanh?",
+      "expected_source": "sample_guide.md",
+      "hit": false,
+      "rank": null,
+      "scores": [
+        0.42590123,
+        0.41645125,
+        0.36796838,
+        0.34722462,
+        0.33256936
+      ],
+      "sources": [
+        "kien-truc-he-thong.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "huong-dan-van-hanh.md"
+      ]
+    },
+    {
+      "case_id": "Bước nào chậm nhất?",
+      "question": "Trong ba phần tạo nên độ trễ của một truy vấn, phần nào chiếm nhiều thời gian nhất?",
+      "expected_source": "xu-ly-su-co.md",
+      "hit": true,
+      "rank": 1,
+      "scores": [
+        0.5952016,
+        0.50094604,
+        0.43000406,
+        0.4074722,
+        0.35911548
+      ],
+      "sources": [
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "xu-ly-su-co.md",
+        "kien-truc-he-thong.md",
+        "kien-truc-he-thong.md"
+      ]
+    }
+  ],
+  "top_k": 5,
+  "score_threshold": 0.2,
+  "cases_file": "/tmp/qa_multiturn.jsonl",
+  "selfcontained": true
+}

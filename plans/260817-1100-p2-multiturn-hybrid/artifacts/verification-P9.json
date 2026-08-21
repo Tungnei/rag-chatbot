@@ -1,0 +1,85 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P9",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-19T14:00:00+00:00",
+  "checks": [
+    {
+      "name": "user-confirmation",
+      "status": "PASS",
+      "detail": "Rui ro lon nhat cua phase (ba quy tac la DE XUAT cua plan, khong phai yeu cau nguoi dung neu) da duoc dong TRUOC khi viet code. Nguoi dung xac nhan ca ba: cap theo nguon (max 2), gop chunk lien ke, boost khi khop title. Va xac nhan doi mac dinh top_k 3 -> 5 sau khi duoc noi ro no ton them ~67% token moi truy van va khong nam sau cong tac nao."
+    },
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "Module chua ton tai -> collection error; sau khi tao module, 13 test thuan chay xanh. Test 14 (qua orchestrator) do vi tang chua duoc noi day."
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 156 passed (142 -> 156, +14). tests/test_api.py va tests/test_orchestrator.py xanh KHONG SUA voi enabled=false.",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 52 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 34 source files"
+    },
+    {
+      "name": "h1-disabled-still-cuts",
+      "status": "PASS",
+      "detail": "test_disabled_only_cuts: enabled=false van tra ve dung top_k phan tu, giu nguyen thu tu va score. Tang nay THAY THE phep cat chunks[:top_k] cua phase 8 chu khong dung canh no, nen neu tat ma tra ve nguyen list thi cau hinh rerank=cross_encoder + metadata=false se day 10 chunk vao LLM thay vi 5 — dung dong 3 cua bang phase 10 se chay voi gap doi context so voi ba dong con lai."
+    },
+    {
+      "name": "pipeline-order",
+      "status": "PASS",
+      "detail": "test_pipeline_order_is_boost_sort_merge_cap_cut dung du lieu ma MOI thu tu khac cho ket qua khac (boost nang a0 len 0.55 -> a0+a1 gop -> a5 lap not tran cua a.txt -> b0/c0 -> cat con 3). Cong them test_merge_is_order_independent: cung tap chunk vao theo hai thu tu khac nhau cho ket qua giong het."
+    },
+    {
+      "name": "dry-tokenizer",
+      "status": "PASS",
+      "detail": "grep 'def tokenize' src/ -> DUNG MOT ket qua (retrieval/sparse.py:20). Quy tac 3 dung lai tokenizer cua phase 7 nen BM25 va boost-title chia se cung dinh nghia 'tu la gi' va cung chuan hoa NFKC. test_title_boost_is_case_and_unicode_insensitive se do neu ai do viet tokenizer thu hai o day."
+    },
+    {
+      "name": "token-budget",
+      "status": "PASS",
+      "detail": "DO BANG SO THAT tren van ban tieng Viet, va do tren chunk DA GOP chu khong phai chunk goc (canh bao BL-007): 5 chunk dai nhat -> sau boost/sort/merge/cap con 4 chunk; khoi context = 3283 token; cong tran history 1500 = 4783 / context_token_budget 6000 -> CON DU 1217 token. KHONG tran. Ti le token/ky tu do duoc: tieng Viet 1.97 ky tu/token (chinh-sach-du-lieu.txt: 2479 ky tu -> 1259 token) so voi tieng Anh 4.53 (sample_faq.txt: 1591 -> 351). Tieng Viet ton ~2.3 lan token moi ky tu — day chinh la ly do phase yeu cau DO chu khong CHIA."
+    },
+    {
+      "name": "limits-chain",
+      "status": "PASS",
+      "detail": "configs/default.yaml co khoi chuoi gioi han lien mach ghi ro buoc nao an so nao: dense_prefetch 30 -> sparse_prefetch 30 -> fusion_limit 30 -> rerank.top_n 10 -> top_k 5. top_k giu DUNG MOT nghia. index.html da doi dong bo: output 3->5 va input value 3->5 (neu chi doi YAML thi UI van xin 3 va nguoi dung qua UI khong bao gio thay 5)."
+    },
+    {
+      "name": "eval-metadata-layer",
+      "status": "SKIP",
+      "detail": "KHONG CHAY DUOC: cong ty chan — proxy TechnoPark Web Gateway tra ve trang xac thuc HTML thay vi phan hoi API cho MOI duong ra ngoai (ca host lan container). Phien proxy het han giua chung; cac lan do truoc do trong ngay (phase 7, 8) da chay duoc nen day la trang thai moi, khong phai cau hinh sai. Can nguoi dung dang nhap lai proxy roi chay: RETRIEVER__HYBRID=true RERANK__PROVIDER=noop METADATA_ADJUST__ENABLED=true uv run python scripts/run_eval.py --out data/eval/metadata.json --baseline data/eval/fusion-noop.json"
+    },
+    {
+      "name": "manual-two-source",
+      "status": "SKIP",
+      "detail": "Nghiem thu tay 'hoi mot cau can doi chieu HAI tai lieu, so panel nguon truoc/sau' cung bi chan cung ly do. Day la buoc duy nhat cho thay quy tac 1 giai quyet dung van de no sinh ra de giai — test offline chi chung minh co che cap hoat dong, khong chung minh no huu ich."
+    }
+  ],
+  "verdict": "PASS_WITH_RISK",
+  "notes": [
+    "title_boost=0.05 DA DUOC HIEU CHINH LAI theo so do cua phase 8, dung nhu plan du lieu ([ASSUMED] cho toi khi phase 8 do xong). Do duoc: cross-encoder tra ve logit khong chan, khoang -12 den -4, nen +0.05 la ~0.4% cua dai — VO HINH. Voi noop reranker (cau hinh duoc khuyen nghi sau phase 8) diem la RRF 0.25-1.0, o do 0.05 la ~6% — CO Y NGHIA. Da ghi rang buoc nay thang vao comment cua configs.py va default.yaml de nguoi doc sau khong phai tu suy ra.",
+    "Quy tac 1 (cap theo nguon) la danh doi CO Y: neu tai lieu dung that su co 3 chunk lien quan nhat, cap ve 2 se day mot chunk tot ra de nhuong cho mot chunk kem hon tu nguon khac. Da doi da dang nguon lay do sau. Cach kiem no co dang khong la nhin DANH SACH CASE DOI CHO o buoc eval — buoc dang bi chan.",
+    "Quy tac 2 (gop) co mat mat da biet va da thanh test chu khong phai tai nan: score lay MAX (khong phai tong — tong se thuong cho viec gop va lam hong xep hang), page va title lay cua chunk index nho nhat. Hau qua that: trich dan co the tro vao trang dau cua cap trong khi cau tra loi nam o trang sau, va UI hien dung con so do. Muon tat: merge_adjacent=false.",
+    "KHONG dung retrieval/vector_search.py du ban nhap goi y. Tang nay thao tac tren list[RetrievedChunk] SAU rerank, tuc la o tang orchestrator. Nhet vao vector_search la bat vector store biet ve mot tang chay sau no — dung loai dao nguoc phu thuoc ma tang adaptor ton tai de ngan.",
+    "Cong cua phase theo phase file la 'top_k cuoi = 5 va ngan sach token da do bang so that tren van ban tieng Viet'. Ca hai DA DAT: top_k mac dinh = 5 o ca configs.py, default.yaml va index.html; ngan sach do duoc 4783/6000. Verdict PASS_WITH_RISK vi hai muc can ha tang that (so sanh eval va nghiem thu hai-tai-lieu) bi chan boi proxy, khong phai vi cong chua dat.",
+    "TRANG THAI HA TANG CUOI PHASE: proxy cong ty dang doi xac thuc lai, chan moi ket noi ra ngoai tu ca host lan container. Qdrant (localhost) khong anh huong, van 39 diem. Git push cung bi chan cung ly do — hai commit da san sang o local."
+  ],
+  "run_seq": null
+}

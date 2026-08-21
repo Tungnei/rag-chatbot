@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from rag_chatbot_tung.retrieval import UnsupportedFormatError
-from rag_chatbot_tung.retrieval.document_retrieval import detect_source_type
-from rag_chatbot_tung.validate import SourceType
+from rag_chatbot.retrieval import UnsupportedFormatError
+from rag_chatbot.retrieval.document_retrieval import detect_source_type
+from rag_chatbot.validate import SourceType
 
 
 def test_detect_source_type():

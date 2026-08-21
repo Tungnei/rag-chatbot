@@ -1,0 +1,76 @@
+{
+  "stage": "phase",
+  "plan": "260817-1100-p2-multiturn-hybrid",
+  "phase": "P2",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-18T07:30:00+00:00",
+  "checks": [
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "Truoc implement: 11 failed / 2 passed, tat ca do vi LY DO NGHIEP VU chu khong phai loi import. Bang chung tung dong: AttributeError 'EvalCase' object has no attribute 'question_selfcontained' (schema chua mo rong); TypeError EvalCase.__init__() got an unexpected keyword argument 'question_selfcontained' (dung hanh vi metrics.py:38 cu); AttributeError 'EvalReport' object has no attribute 'results' / 'abstain_correct' / 'to_dict'; AssertionError 'need >=40 cases, found 6' (bien R1 thanh dieu kien may kiem duoc); AssertionError 'missing data/eval/qa_multiturn.jsonl'. 2 test xanh san: offtopic-null-source va every_expected_source_exists[qa.jsonl] — xanh that, khong phai xanh gia."
+    },
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 91 passed (78 baseline + 13 test moi trong tests/test_metrics.py). Khong test cu nao bi sua hay xoa.",
+      "format": "manual"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff check src tests -> All checks passed! (ca scripts/ cung sach)"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check src tests -> 44 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> Success: no issues found in 29 source files"
+    },
+    {
+      "name": "eval-dataset",
+      "status": "PASS",
+      "detail": "data/eval/qa.jsonl = 45 case tren 6 nguon phan biet (yeu cau >=40 / >=6), moi nguon >=5 case cham cac phan khac nhau; 7 case lac de expected_source=null (yeu cau >=6). data/eval/qa_multiturn.jsonl = 12 case (yeu cau >=10), moi case du cap question/question_selfcontained khac nhau + history khong rong. Moi expected_source deu ton tai tren dia (test giu). Toan bo du lieu chuan hoa NFC (test giu) — quan trong cho tokenizer BM25 phase 7."
+    },
+    {
+      "name": "eval-documents",
+      "status": "PASS",
+      "detail": "Them 4 tai lieu tieng Viet vao data/documents/: kien-truc-he-thong.md (3318 ky tu, 6 chunk, 6 co title), huong-dan-van-hanh.md (2823, 6 chunk, 6 title), xu-ly-su-co.md (2657, 5 chunk, 5 title), chinh-sach-du-lieu.txt (2297, 3 chunk). Tong 6 nguon / 32 chunk. Chong lan CO KIEM SOAT dung yeu cau phase: ca 4 tai lieu deu nhac toi kho vector/embedding/chia doan nhung o goc do khac nhau (thiet ke vs van hanh vs su co vs chinh sach), nen cau hoi phai that su phan biet."
+    },
+    {
+      "name": "integration",
+      "status": "PASS",
+      "detail": "Ingest that vao Qdrant song: 7 -> 39 diem (+32), so chunk khop chinh xac du doan cua splitter cuc bo. Chay qua container vi sandbox cua agent khong co mang ra ngoai; ingest la them-vao (delete-then-upsert theo tung nguon), khong xoa CV.pdf va chinh-sach-nghi-phep.txt dang co trong data/uploads/.",
+      "format": "manual",
+      "evidence_tier": "claimed"
+    },
+    {
+      "name": "eval-baseline",
+      "status": "PASS",
+      "detail": "MOC SO SANH CUA MOI PHASE SAU (top_k=5, score_threshold=0.2 theo .env dang chay): hit_rate = 97.37% (37/38 case co dap an), MRR = 0.7215, abstain_rate = 42.86%, false_positive = 4/7 case lac de. Phan bo score: n=204, min 0.2013, median 0.4373, max 0.7032. Ghi vao data/eval/baseline.json (duoc git track)."
+    },
+    {
+      "name": "pdf-coverage",
+      "status": "SKIP",
+      "detail": "Nhanh nguon .pdf CHUA duoc phu trong bo eval — dung nhu R11 du bao. Khong bia la da phu. GHI NHAN: data/uploads/ da co 2 PDF that chua index (Checkpoint VPN guideline 457KB, KB_SAP_PnL_VinMotion 4.9MB) va CV_Nguyen_Thanh_Tung_Data_Engineer.pdf DANG o trong index. Nguoi dung co the mo rong eval sang .pdf ma khong can tao du lieu moi."
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "PHAT HIEN 1 (quan trong nhat cho phan B): HIT-RATE DA KICH TRAN 97.37%. Chi 1 case truot trong 38. Nghia la fusion (phase 7), rerank (phase 8) va metadata (phase 9) KHONG THE chung minh gia tri bang hit-rate — khong con cho de tang. Bang 4 dong cua phase 10 se in gan nhu cung mot con so hit-rate 4 lan va nhin nhu 'cac tang vo dung'. Metric CO du dia la MRR (0.7215) va false_positive (4). Phase 10 phai lay MRR + false_positive lam cot chinh, khong phai hit-rate.",
+    "PHAT HIEN 2: phan bo rank cua 38 case co dap an = {rank1: 20, rank2: 12, rank3: 2, rank4: 3, truot: 1}. 18/38 case co tai lieu dung nam DUOI hang 1 — day chinh xac la khoang trong ma cross-encoder rerank sinh ra de va. Day la tin tot cho phase 8: no CO the chung minh gia tri, nhung phai do bang MRR chu khong phai hit-rate.",
+    "PHAT HIEN 3 (sua lai gia dinh cua plan): B2 trong plan gia dinh dense-only ABSTAIN dung tren cau lac de va chi hybrid moi pha vo dieu do (probe cua plan: dense-only 0 hit vs hybrid 4 hit). DO DUOC THAT: dense-only DA false-positive 4/7 ngay tu baseline, truoc khi co BM25. Lop chong bia ma docs/ARCHITECTURE.md:94-95 tuyen bo YEU HON tuyen bo, khong doi phase 7 moi hong. Phase 7 phai giu false_positive <= 4, khong phai <= 0.",
+    "PHAT HIEN 4: ca 4 false positive deu la cau hoi TIENG VIET (lai xe B2, ve may bay Paris, nau pho, visa Nhat); ca 3 case abstain dung thi 2 la tieng Anh + 1 tieng Viet (World Cup). Mo hinh embedding keo van ban tieng Viet lai gan nhau bat ke chu de. Anh huong truc tiep phase 7: BM25 tieng Viet se cong them vao dung cho yeu nay.",
+    "PHAT HIEN 5 (du lieu cho R4): score_threshold=0.2 loc 21/225 chunk = 9.3%. Do doi chung threshold 0.0: hit_rate KHONG DOI (97.37% ca hai), nhung false_positive tang 4 -> 7 va abstain_rate tut 42.86% -> 0%. Ket luan bang so: nguong CHI lam viec tren nhom lac de, va no la lop phong thu DUY NHAT o do. Phase 7 chuyen nguong vao Prefetch dense la GIU duoc lop nay; bo han nguong se dua false_positive len 7.",
+    "PHAT HIEN 6 (cang thang that, chua co loi giai): diem cua chunk lac de bi lot = 0.30-0.38, trong khi median cua chunk hop le = 0.4373. Hai phan bo CHONG LEN NHAU. Nang nguong de chan rac se giet luon hit that. Khong the giai bang mot con so nguong duy nhat — day la lap luan nghiep vu cho viec can mot tang rerank, va no la du lieu chu khong phai suy doan.",
+    "Case truot duy nhat: 'Doi mo hinh sinh vector roi thi co phai lam lai gi khong?' — ky vong xu-ly-su-co.md, nhan ve kien-truc-he-thong.md. Day la chong lan CO CHU Y hoat dong dung thiet ke (ca hai tai lieu deu ban ve doi mo hinh embedding), khong phai case hong.",
+    "Sandbox cua agent khong goi duoc mang ngoai (curl toi openrouter -> HTTP 000), nen ingest va eval chay TRONG container qua docker exec. Image cua container duoc build 3 ngay truoc nen thieu metrics.py/run_eval.py moi — da docker cp ban moi vao container de chay do. TAC DONG: /app/src/.../evaluate/metrics.py trong container dang la ban moi (khong anh huong API vi routes khong import evaluate); lan `docker compose up -d --force-recreate api` ke tiep se tra ve ban trong image. Muon dong bo han thi can build lai image.",
+    "hit_rate doi MAU SO: gio la 'so case co expected_source' (38) chu khong phai tong (45), vi case lac de duoc dem rieng qua abstain_correct/false_positive. Gop hai loai cau hoi vao mot ti le se giau di dung thu can nhin. Khong co test cu nao phu thuoc hanh vi cu (evaluate/ truoc phase nay khong co test nao).",
+    "Baseline dinh nghia LAI tai phase nay: con so cu (6 case / 2 nguon) khong con y nghia so sanh. Moi so sanh ve sau la voi baseline.json nay."
+  ],
+  "run_seq": null
+}

@@ -1,0 +1,48 @@
+{
+  "stage": "phase",
+  "plan": "260812-1221-p1-chat-ui",
+  "phase": "P5",
+  "actor": "user:v.tungnt200@vinsmartfuture.tech/agent:claude",
+  "ts": "2026-08-12T11:48:00+00:00",
+  "checks": [
+    {
+      "name": "unit",
+      "status": "PASS",
+      "detail": "uv run pytest -q -> 60 passed (56 + 4 test trang admin)",
+      "format": "manual"
+    },
+    {
+      "name": "tdd-red",
+      "status": "PASS",
+      "detail": "Trước implement: 3 failed (404 trang admin, thiếu hook, thiếu cảnh báo no-auth)"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "detail": "ruff -> All checks passed!"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "detail": "black --check -> 38 files unchanged"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "detail": "mypy src -> no issues in 27 files"
+    },
+    {
+      "name": "manual-acceptance",
+      "status": "SKIP",
+      "detail": "HOÃN cùng phase 3: cần Qdrant server, mà docker daemon chưa pull được vì thiếu root CA."
+    }
+  ],
+  "verdict": "PASS",
+  "notes": [
+    "Danh sách tài liệu đến từ GET /documents, không từ localStorage — tải lại trang vẫn đúng.",
+    "refresh() gọi /documents và /collections cùng lúc: làm mới một cái sẽ khiến giao diện tự mâu thuẫn.",
+    "DELETE trả 204 không body -> kiểm status thay vì .json().",
+    "Giữ cả nút xoá theo dòng lẫn form xoá theo tên: form là lối thoát cho nguồn không nằm trong danh sách, ví dụ trang web index bằng URL.",
+    "Form upload và form URL tách riêng nên không thể gửi đồng thời path và url (422)."
+  ]
+}
