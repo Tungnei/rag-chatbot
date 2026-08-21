@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import yaml
 
-from rag_chatbot_tung.configs import Settings, get_settings
+from rag_chatbot.configs import Settings, get_settings
 
 # Isolation from a developer's .env is suite-wide — see the away_from_dotenv fixture
 # in conftest.py.

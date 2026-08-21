@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from rag_chatbot_tung.api.app import create_app
-from rag_chatbot_tung.llm_generator import NO_CONTEXT_ANSWER
+from rag_chatbot.api.app import create_app
+from rag_chatbot.llm_generator import NO_CONTEXT_ANSWER
 
 
 @pytest.fixture

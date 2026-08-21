@@ -25,16 +25,16 @@ Phụ thuộc: phase 7.
 
 ## Files
 
-- **Modify** `src/rag_chatbot_tung/adaptor/protocols.py` — thêm `Reranker` Protocol.
-- **Create** `src/rag_chatbot_tung/rerank/__init__.py`, `noop.py`, `cross_encoder.py`.
-- **Modify** `src/rag_chatbot_tung/providers.py` — `build_reranker`.
-- **Modify** `src/rag_chatbot_tung/configs.py`, `configs/default.yaml` — `RerankSettings`.
-- **Modify** `src/rag_chatbot_tung/orchestrator.py` — chèn rerank vào `answer()`.
+- **Modify** `src/rag_chatbot/adaptor/protocols.py` — thêm `Reranker` Protocol.
+- **Create** `src/rag_chatbot/rerank/__init__.py`, `noop.py`, `cross_encoder.py`.
+- **Modify** `src/rag_chatbot/providers.py` — `build_reranker`.
+- **Modify** `src/rag_chatbot/configs.py`, `configs/default.yaml` — `RerankSettings`.
+- **Modify** `src/rag_chatbot/orchestrator.py` — chèn rerank vào `answer()`.
 - **Modify** `pyproject.toml` — optional dependency group.
 - **Modify** `Dockerfile` — target riêng.
 - **Create** `tests/test_rerank.py`.
 - **Modify** `tests/test_providers.py` — nhánh `build_reranker`.
-- **Modify** `src/rag_chatbot_tung/evaluate/metrics.py` — **B1**: chuyển `evaluate_retrieval` từ `orchestrator.vector_store.search(...)` (`metrics.py:50-53`) sang `orchestrator.retrieve(...)`. Không có dòng này thì cả phase 8 lẫn phase 9 không bao giờ được đo.
+- **Modify** `src/rag_chatbot/evaluate/metrics.py` — **B1**: chuyển `evaluate_retrieval` từ `orchestrator.vector_store.search(...)` (`metrics.py:50-53`) sang `orchestrator.retrieve(...)`. Không có dòng này thì cả phase 8 lẫn phase 9 không bao giờ được đo.
 - **Modify** `tests/conftest.py` — **H4**: fixture autouse đặt `HF_HUB_OFFLINE=1` + `TRANSFORMERS_OFFLINE=1`.
 
 ## Protocol
@@ -197,7 +197,7 @@ Vẫn không `isinstance` một class cụ thể nên không phá quy tắc ở 
    ```python
    out = subprocess.run(
        [sys.executable, "-c",
-        "import sys; import rag_chatbot_tung.rerank; "
+        "import sys; import rag_chatbot.rerank; "
         "print('torch' in sys.modules, 'sentence_transformers' in sys.modules)"],
        capture_output=True, text=True, check=True,
    )
@@ -244,7 +244,7 @@ uv run mypy src
 - [ ] Suite chạy **không có** `torch`/`sentence_transformers` trong `.venv` — tức là `uv sync` mặc định (không `--extra rerank`) vẫn cho suite xanh đủ.
 - [ ] `grep -rn "^from sentence_transformers\|^import torch" src/` → rỗng (mọi import nặng đều nằm trong hàm).
 - [ ] `rerank.provider` mặc định `noop`.
-- [ ] `grep -rn "import" src/rag_chatbot_tung/orchestrator.py | grep -i "rerank\."` → chỉ import Protocol, không import class cụ thể.
+- [ ] `grep -rn "import" src/rag_chatbot/orchestrator.py | grep -i "rerank\."` → chỉ import Protocol, không import class cụ thể.
 
 **Cần hạ tầng thật (R12) — đây là phần R7 được trả lời bằng số:**
 

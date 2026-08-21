@@ -83,7 +83,7 @@ Eval hiện tại có 6 case trên 2 nguồn. Đoán bừa giữa 2 nguồn đã
 **Files**
 - Modify `data/eval/qa.jsonl` — lên **≥40 case, ≥6 nguồn**, đủ cả `.md`/`.txt`/`.pdf`
 - Create `data/eval/qa_multiturn.jsonl` — case có đại từ/tham chiếu ngữ cảnh, schema thêm `history`
-- Modify `src/rag_chatbot_tung/evaluate/metrics.py` — đo theo **từng tầng**, không chỉ tổng
+- Modify `src/rag_chatbot/evaluate/metrics.py` — đo theo **từng tầng**, không chỉ tổng
 - Modify `scripts/run_eval.py` — in bảng so sánh, thêm `--baseline` để diff
 
 `EvalReport` cần tách được hit-rate của: dense-only → sau fusion → sau rerank → sau metadata. Không có phân tách này thì phần B tốn 2GB image mà không biết tầng nào đóng góp.
@@ -95,9 +95,9 @@ Thêm luôn: log `score` thật của các chunk trả về, để kiểm chứn
 ## Phase 2 — Multi-turn: schema, prompt, budget
 
 **Files**
-- Modify `src/rag_chatbot_tung/validate.py` — thêm `Turn`, thêm `history` vào `QueryRequest`
-- Modify `src/rag_chatbot_tung/llm_generator/prompts.py` — dựng messages có lịch sử
-- Modify `src/rag_chatbot_tung/orchestrator.py` — truyền `request.history` xuống
+- Modify `src/rag_chatbot/validate.py` — thêm `Turn`, thêm `history` vào `QueryRequest`
+- Modify `src/rag_chatbot/llm_generator/prompts.py` — dựng messages có lịch sử
+- Modify `src/rag_chatbot/orchestrator.py` — truyền `request.history` xuống
 - Modify `tests/test_prompts.py`, `tests/test_orchestrator.py`, `tests/test_api.py`
 
 **Schema**
@@ -127,8 +127,8 @@ class QueryRequest(BaseModel):
 ## Phase 3 — Multi-turn: UI
 
 **Files**
-- Modify `src/rag_chatbot_tung/api/static/app.js` — giữ mảng history, gửi 3 lượt gần nhất
-- Modify `src/rag_chatbot_tung/api/static/index.html` — gỡ `#single-turn-notice`
+- Modify `src/rag_chatbot/api/static/app.js` — giữ mảng history, gửi 3 lượt gần nhất
+- Modify `src/rag_chatbot/api/static/index.html` — gỡ `#single-turn-notice`
 - Modify `tests/test_ui.py` — sửa `test_page_states_single_turn` (`tests/test_ui.py:91`)
 
 Lưu ý: `test_page_states_single_turn` khẳng định `id="single-turn-notice"` có trong HTML. Test này sẽ đỏ, và đỏ **đúng** — nó đang bảo vệ một lời hứa mà phase này cố tình phá. Sửa test thành khẳng định ngược lại (notice đã biến mất, và có chỉ báo số lượt đang giữ). Không xoá test.
@@ -167,7 +167,7 @@ Hai chướng ngại cụ thể:
 2. Phải **re-ingest toàn bộ tài liệu**. Không có đường migrate tại chỗ từ vector không tên sang có tên.
 
 **Files**
-- Modify `src/rag_chatbot_tung/retrieval/vector_search.py` — `ensure_collection` dựng named + sparse; thêm kiểm tra schema
+- Modify `src/rag_chatbot/retrieval/vector_search.py` — `ensure_collection` dựng named + sparse; thêm kiểm tra schema
 - Create `scripts/migrate_collection.py` — dựng lại collection và nạp lại từ `data/documents/`
 - Modify `docs/SETUP.md` — quy trình migrate
 
@@ -176,11 +176,11 @@ Hai chướng ngại cụ thể:
 ## Phase 6 — BM25 + RRF fusion
 
 **Files**
-- Create `src/rag_chatbot_tung/retrieval/sparse.py` — tokenizer + mã hoá term-frequency
-- Modify `src/rag_chatbot_tung/adaptor/protocols.py` — đổi chữ ký `search`
-- Modify `src/rag_chatbot_tung/retrieval/vector_search.py` — prefetch + `FusionQuery(RRF)`
-- Modify `src/rag_chatbot_tung/retrieval/document_retrieval.py` — sinh sparse vector lúc ingest
-- Modify `src/rag_chatbot_tung/orchestrator.py`, `configs/default.yaml`
+- Create `src/rag_chatbot/retrieval/sparse.py` — tokenizer + mã hoá term-frequency
+- Modify `src/rag_chatbot/adaptor/protocols.py` — đổi chữ ký `search`
+- Modify `src/rag_chatbot/retrieval/vector_search.py` — prefetch + `FusionQuery(RRF)`
+- Modify `src/rag_chatbot/retrieval/document_retrieval.py` — sinh sparse vector lúc ingest
+- Modify `src/rag_chatbot/orchestrator.py`, `configs/default.yaml`
 - Create `tests/test_sparse.py`; modify `tests/test_vector_search.py`, `tests/conftest.py`
 
 **Bẫy nghiêm trọng nhất: hàm băm term phải tất định.**
@@ -200,9 +200,9 @@ Hai chướng ngại cụ thể:
 ## Phase 7 — Cross-encoder rerank (top30 → top10)
 
 **Files**
-- Modify `src/rag_chatbot_tung/adaptor/protocols.py` — thêm `Reranker` Protocol
-- Create `src/rag_chatbot_tung/rerank/__init__.py`, `cross_encoder.py`, `noop.py`
-- Modify `src/rag_chatbot_tung/providers.py`, `configs.py`, `orchestrator.py`, `Dockerfile`, `pyproject.toml`
+- Modify `src/rag_chatbot/adaptor/protocols.py` — thêm `Reranker` Protocol
+- Create `src/rag_chatbot/rerank/__init__.py`, `cross_encoder.py`, `noop.py`
+- Modify `src/rag_chatbot/providers.py`, `configs.py`, `orchestrator.py`, `Dockerfile`, `pyproject.toml`
 - Create `tests/test_rerank.py`
 
 `NoopReranker` là mặc định và là thứ test dùng — bộ test **phải chạy offline không tải model**, giữ đúng tính chất ở `ARCHITECTURE.md:86`.

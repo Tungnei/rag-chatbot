@@ -13,7 +13,7 @@ No authentication on either page — localhost only.
 
 ```bash
 uv sync                                # install dependencies
-uv run rag-chatbot-tung                # start the API
+uv run rag-chatbot                # start the API
 uv run python scripts/ingest.py        # index data/documents/
 uv run python scripts/run_eval.py      # retrieval hit-rate and MRR
 uv run pytest -q                       # tests (offline)
@@ -58,8 +58,8 @@ curl -X DELETE 'localhost:8000/documents?source=sample_faq.txt'
 ## Python usage
 
 ```python
-from rag_chatbot_tung.core import RAGOrchestrator, get_settings
-from rag_chatbot_tung.validate import IngestRequest, QueryRequest
+from rag_chatbot.core import RAGOrchestrator, get_settings
+from rag_chatbot.validate import IngestRequest, QueryRequest
 
 orchestrator = RAGOrchestrator(get_settings())
 orchestrator.startup()

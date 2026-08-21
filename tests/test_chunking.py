@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from rag_chatbot_tung.chunking import TextSplitter
-from rag_chatbot_tung.configs import ChunkingSettings
+from rag_chatbot.chunking import TextSplitter
+from rag_chatbot.configs import ChunkingSettings
 
 
 def make_splitter(**kw) -> TextSplitter:

@@ -3,10 +3,10 @@ from __future__ import annotations
 import pytest
 from qdrant_client import QdrantClient, models
 
-from rag_chatbot_tung.adaptor import VectorPoint
-from rag_chatbot_tung.retrieval.sparse import encode
-from rag_chatbot_tung.retrieval.vector_search import CollectionSchemaError, QdrantVectorStore
-from rag_chatbot_tung.validate import SourceType
+from rag_chatbot.adaptor import VectorPoint
+from rag_chatbot.retrieval.sparse import encode
+from rag_chatbot.retrieval.vector_search import CollectionSchemaError, QdrantVectorStore
+from rag_chatbot.validate import SourceType
 
 PAYLOAD = {
     "text": "Qdrant stores the vectors.",

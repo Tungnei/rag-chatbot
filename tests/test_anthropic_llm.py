@@ -6,8 +6,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from rag_chatbot_tung.configs import LLMSettings
-from rag_chatbot_tung.llm_generator import AnthropicLLM
+from rag_chatbot.configs import LLMSettings
+from rag_chatbot.llm_generator import AnthropicLLM
 
 
 class FakeMessages:

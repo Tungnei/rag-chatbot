@@ -41,10 +41,10 @@ edges:
   - {from: P9, to: P10}
 
   # --- Cạnh SERIALIZING thuần (không phải quan hệ logic) ---
-  # P4 và P9 cùng sửa src/rag_chatbot_tung/api/static/index.html.
+  # P4 và P9 cùng sửa src/rag_chatbot/api/static/index.html.
   # Đã được chuỗi P4->P5->...->P9 bao trùm; ghi lại ở đây để lần sau ai đó định
   # rút gọn chuỗi thì thấy ràng buộc này trước khi cắt.
-  # P2 và P7 cùng sửa src/rag_chatbot_tung/evaluate/metrics.py — cũng đã bị bao trùm.
+  # P2 và P7 cùng sửa src/rag_chatbot/evaluate/metrics.py — cũng đã bị bao trùm.
   # P5 và P10 cùng sửa docs/decisions.md, docs/ARCHITECTURE.md,
   # docs/system-architecture.md, README.md, docs/QUICK_REFERENCE.md — đã bị bao trùm.
 
@@ -61,17 +61,17 @@ subtasks:
       - tests/test_metrics.py
     files_to_modify:
       - data/eval/qa.jsonl
-      - src/rag_chatbot_tung/evaluate/metrics.py
+      - src/rag_chatbot/evaluate/metrics.py
       - scripts/run_eval.py
     post: [verification-P2.json]
   P3:
     files_to_create: []
     files_to_modify:
-      - src/rag_chatbot_tung/validate.py
-      - src/rag_chatbot_tung/llm_generator/prompts.py
-      - src/rag_chatbot_tung/configs.py
+      - src/rag_chatbot/validate.py
+      - src/rag_chatbot/llm_generator/prompts.py
+      - src/rag_chatbot/configs.py
       - configs/default.yaml
-      - src/rag_chatbot_tung/orchestrator.py
+      - src/rag_chatbot/orchestrator.py
       - tests/test_prompts.py
       - tests/test_orchestrator.py
       - tests/test_api.py
@@ -79,8 +79,8 @@ subtasks:
   P4:
     files_to_create: []
     files_to_modify:
-      - src/rag_chatbot_tung/api/static/app.js
-      - src/rag_chatbot_tung/api/static/index.html
+      - src/rag_chatbot/api/static/app.js
+      - src/rag_chatbot/api/static/index.html
       - tests/test_ui.py
     post: [verification-P4.json]
   P5:
@@ -96,41 +96,41 @@ subtasks:
     files_to_create:
       - scripts/migrate_collection.py
     files_to_modify:
-      - src/rag_chatbot_tung/retrieval/vector_search.py
+      - src/rag_chatbot/retrieval/vector_search.py
       - tests/test_vector_search.py
       - docs/SETUP.md
     post: [verification-P6.json]
   P7:
     files_to_create:
-      - src/rag_chatbot_tung/retrieval/sparse.py
+      - src/rag_chatbot/retrieval/sparse.py
       - tests/test_sparse.py
     files_to_modify:
-      - src/rag_chatbot_tung/adaptor/protocols.py
-      - src/rag_chatbot_tung/retrieval/vector_search.py
-      - src/rag_chatbot_tung/retrieval/document_retrieval.py
-      - src/rag_chatbot_tung/retrieval/__init__.py
-      - src/rag_chatbot_tung/orchestrator.py
-      - src/rag_chatbot_tung/evaluate/metrics.py
-      - src/rag_chatbot_tung/configs.py
+      - src/rag_chatbot/adaptor/protocols.py
+      - src/rag_chatbot/retrieval/vector_search.py
+      - src/rag_chatbot/retrieval/document_retrieval.py
+      - src/rag_chatbot/retrieval/__init__.py
+      - src/rag_chatbot/orchestrator.py
+      - src/rag_chatbot/evaluate/metrics.py
+      - src/rag_chatbot/configs.py
       - configs/default.yaml
       - tests/test_vector_search.py
     post: [verification-P7.json]
   P8:
     files_to_create:
-      - src/rag_chatbot_tung/rerank/__init__.py
-      - src/rag_chatbot_tung/rerank/noop.py
-      - src/rag_chatbot_tung/rerank/cross_encoder.py
+      - src/rag_chatbot/rerank/__init__.py
+      - src/rag_chatbot/rerank/noop.py
+      - src/rag_chatbot/rerank/cross_encoder.py
       - tests/test_rerank.py
     files_to_modify:
-      - src/rag_chatbot_tung/adaptor/protocols.py
-      - src/rag_chatbot_tung/providers.py
-      - src/rag_chatbot_tung/configs.py
+      - src/rag_chatbot/adaptor/protocols.py
+      - src/rag_chatbot/providers.py
+      - src/rag_chatbot/configs.py
       - configs/default.yaml
-      - src/rag_chatbot_tung/orchestrator.py
+      - src/rag_chatbot/orchestrator.py
       # B1: phase này tách RAGOrchestrator.retrieve() và metrics.py PHẢI chuyển
       # sang gọi nó. Thiếu dòng này thì run_eval không bao giờ chạy qua rerank
       # và bảng của P10 in cùng một con số ba lần.
-      - src/rag_chatbot_tung/evaluate/metrics.py
+      - src/rag_chatbot/evaluate/metrics.py
       - pyproject.toml
       - Dockerfile
       - tests/test_providers.py
@@ -139,17 +139,17 @@ subtasks:
     post: [verification-P8.json]
   P9:
     files_to_create:
-      - src/rag_chatbot_tung/retrieval/metadata_adjust.py
+      - src/rag_chatbot/retrieval/metadata_adjust.py
       - tests/test_metadata_adjust.py
     files_to_modify:
-      - src/rag_chatbot_tung/retrieval/__init__.py
-      - src/rag_chatbot_tung/orchestrator.py
-      - src/rag_chatbot_tung/configs.py
+      - src/rag_chatbot/retrieval/__init__.py
+      - src/rag_chatbot/orchestrator.py
+      - src/rag_chatbot/configs.py
       - configs/default.yaml
-      - src/rag_chatbot_tung/api/static/index.html
+      - src/rag_chatbot/api/static/index.html
       # B1: tầng metadata thay thế phép cắt trong retrieve(), nên đường đo phải
       # đi qua nó. Cùng lý do với P8.
-      - src/rag_chatbot_tung/evaluate/metrics.py
+      - src/rag_chatbot/evaluate/metrics.py
     post: [verification-P9.json]
   P10:
     files_to_create: []

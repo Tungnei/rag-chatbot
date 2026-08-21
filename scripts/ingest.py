@@ -5,9 +5,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from rag_chatbot_tung.configs import get_settings
-from rag_chatbot_tung.logging import setup_logging
-from rag_chatbot_tung.orchestrator import RAGOrchestrator
+from rag_chatbot.configs import get_settings
+from rag_chatbot.logging import setup_logging
+from rag_chatbot.orchestrator import RAGOrchestrator
 
 
 def main() -> None:

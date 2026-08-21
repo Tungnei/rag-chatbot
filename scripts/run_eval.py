@@ -6,10 +6,10 @@ import argparse
 import json
 from pathlib import Path
 
-from rag_chatbot_tung.configs import get_settings
-from rag_chatbot_tung.evaluate.metrics import EvalReport, evaluate_retrieval, load_cases
-from rag_chatbot_tung.logging import setup_logging
-from rag_chatbot_tung.orchestrator import RAGOrchestrator
+from rag_chatbot.configs import get_settings
+from rag_chatbot.evaluate.metrics import EvalReport, evaluate_retrieval, load_cases
+from rag_chatbot.logging import setup_logging
+from rag_chatbot.orchestrator import RAGOrchestrator
 
 
 def _print_report(report: EvalReport, top_k: int) -> None:

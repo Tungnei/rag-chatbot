@@ -3,9 +3,9 @@ from __future__ import annotations
 import subprocess
 import sys
 
-from rag_chatbot_tung.adaptor import Reranker
-from rag_chatbot_tung.rerank import NoopReranker
-from rag_chatbot_tung.validate import QueryRequest, RetrievedChunk, SourceType
+from rag_chatbot.adaptor import Reranker
+from rag_chatbot.rerank import NoopReranker
+from rag_chatbot.validate import QueryRequest, RetrievedChunk, SourceType
 
 
 def chunk(text: str, index: int, score: float = 0.9) -> RetrievedChunk:
@@ -77,7 +77,7 @@ def test_importing_rerank_package_does_not_import_torch():
         [
             sys.executable,
             "-c",
-            "import sys; import rag_chatbot_tung.rerank; "
+            "import sys; import rag_chatbot.rerank; "
             "print('torch' in sys.modules, 'sentence_transformers' in sys.modules)",
         ],
         capture_output=True,
@@ -89,7 +89,7 @@ def test_importing_rerank_package_does_not_import_torch():
 
 
 def test_orchestrator_applies_reranker(settings, embedder, vector_store, llm, pipeline, sample_txt):
-    from rag_chatbot_tung.orchestrator import RAGOrchestrator
+    from rag_chatbot.orchestrator import RAGOrchestrator
 
     pipeline.ingest_file(sample_txt)
     reranker = RecordingReranker()
@@ -108,7 +108,7 @@ def test_orchestrator_applies_reranker(settings, embedder, vector_store, llm, pi
 def test_reranker_not_called_when_no_chunks(settings, embedder, vector_store, llm):
     """Rerank runs after the empty check: calling a model to hand back an empty list
     wastes time and would erode the empty-result guard."""
-    from rag_chatbot_tung.orchestrator import RAGOrchestrator
+    from rag_chatbot.orchestrator import RAGOrchestrator
 
     reranker = RecordingReranker()
     orchestrator = RAGOrchestrator(
@@ -123,7 +123,7 @@ def test_reranker_not_called_when_no_chunks(settings, embedder, vector_store, ll
 def test_reranker_output_flows_into_sources(settings, embedder, vector_store, llm, pipeline):
     """Proves rerank drives what the LLM and the user see, rather than running and
     then being discarded."""
-    from rag_chatbot_tung.orchestrator import RAGOrchestrator
+    from rag_chatbot.orchestrator import RAGOrchestrator
 
     ingest_several(pipeline, settings)
     plain = RAGOrchestrator(settings, embedder=embedder, vector_store=vector_store, llm=llm)
@@ -150,7 +150,7 @@ def test_injected_reranker_gets_the_full_fan_out(settings, embedder, vector_stor
     injected reranker fed only top_k candidates — it would reorder 5 into 5 and the
     entire point of reranking would vanish, with every other test still green.
     """
-    from rag_chatbot_tung.orchestrator import RAGOrchestrator
+    from rag_chatbot.orchestrator import RAGOrchestrator
 
     ingest_several(pipeline, settings)
     settings.rerank.provider = "noop"  # deliberately left at the default
@@ -172,7 +172,7 @@ def test_top_n_never_drops_below_requested_top_k(
 
     Without the guard a user raising the slider to 20 would silently get 10.
     """
-    from rag_chatbot_tung.orchestrator import RAGOrchestrator
+    from rag_chatbot.orchestrator import RAGOrchestrator
 
     pipeline.ingest_file(sample_txt)
     reranker = RecordingReranker()

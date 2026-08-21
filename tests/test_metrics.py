@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from rag_chatbot_tung.configs import PROJECT_ROOT
-from rag_chatbot_tung.evaluate.metrics import EvalCase, EvalReport, evaluate_retrieval, load_cases
+from rag_chatbot.configs import PROJECT_ROOT
+from rag_chatbot.evaluate.metrics import EvalCase, EvalReport, evaluate_retrieval, load_cases
 
 # The autouse `away_from_dotenv` fixture chdirs into tmp_path, so a relative path here
 # would resolve against the temp dir and silently read nothing. Anchor on the package

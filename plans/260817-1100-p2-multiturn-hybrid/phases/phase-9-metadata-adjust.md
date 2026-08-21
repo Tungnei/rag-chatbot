@@ -17,7 +17,7 @@ Tầng cuối trước LLM: `cross-encoder top10 → metadata adjustment → top
 
 **Sơ đồ người dùng vẽ có tầng này nhưng chưa định nghĩa nội dung.** Phase này đề xuất nội dung, và đề xuất đó **cần người dùng xác nhận ở gate validate** trước khi cook chạy tới đây. Ba quy tắc dưới đây là suy luận từ payload đang có, không phải yêu cầu người dùng đã nêu.
 
-Payload hiện có đúng năm trường: `source`, `source_type`, `title`, `page`, `index` (`src/rag_chatbot_tung/validate.py:17-25`, ghi vào Qdrant qua `chunk.model_dump(mode="json")` ở `retrieval/document_retrieval.py:165`). **Không có timestamp** → **không làm được recency boost**. Thêm timestamp vào payload là một lần re-ingest nữa, và không đáng ở đợt này.
+Payload hiện có đúng năm trường: `source`, `source_type`, `title`, `page`, `index` (`src/rag_chatbot/validate.py:17-25`, ghi vào Qdrant qua `chunk.model_dump(mode="json")` ở `retrieval/document_retrieval.py:165`). **Không có timestamp** → **không làm được recency boost**. Thêm timestamp vào payload là một lần re-ingest nữa, và không đáng ở đợt này.
 
 Phase ship với công tắc mặc định **TẮT** (`metadata_adjust.enabled: false`), như phase 7 và 8.
 
@@ -25,12 +25,12 @@ Phụ thuộc: phase 8.
 
 ## Files
 
-- **Create** `src/rag_chatbot_tung/retrieval/metadata_adjust.py` — hàm thuần, không state.
-- **Modify** `src/rag_chatbot_tung/evaluate/metrics.py` — **B1**: tầng này thay thế phép cắt cuối trong `retrieve()`, nên đường đo phải phản ánh nó. Cùng lý do với phase 8.
-- **Modify** `src/rag_chatbot_tung/retrieval/__init__.py` — export.
-- **Modify** `src/rag_chatbot_tung/orchestrator.py` — chèn vào `answer()`.
-- **Modify** `src/rag_chatbot_tung/configs.py`, `configs/default.yaml` — `MetadataAdjustSettings`, và **chốt lại toàn bộ chuỗi giới hạn**.
-- **Modify** `src/rag_chatbot_tung/api/static/index.html` — mặc định slider `top_k`.
+- **Create** `src/rag_chatbot/retrieval/metadata_adjust.py` — hàm thuần, không state.
+- **Modify** `src/rag_chatbot/evaluate/metrics.py` — **B1**: tầng này thay thế phép cắt cuối trong `retrieve()`, nên đường đo phải phản ánh nó. Cùng lý do với phase 8.
+- **Modify** `src/rag_chatbot/retrieval/__init__.py` — export.
+- **Modify** `src/rag_chatbot/orchestrator.py` — chèn vào `answer()`.
+- **Modify** `src/rag_chatbot/configs.py`, `configs/default.yaml` — `MetadataAdjustSettings`, và **chốt lại toàn bộ chuỗi giới hạn**.
+- **Modify** `src/rag_chatbot/api/static/index.html` — mặc định slider `top_k`.
 - **Create** `tests/test_metadata_adjust.py`.
 
 **Không** đụng `retrieval/vector_search.py`. Bản nháp gợi ý phase này cũng chạm vào đó; đã xem lại và nó **không đúng chỗ**: metadata adjustment thao tác trên `list[RetrievedChunk]` **sau** rerank, tức là ở tầng orchestrator, không phải tầng store. Nhét nó vào `vector_search.py` là bắt vector store biết về một tầng chạy sau nó — đúng loại đảo ngược phụ thuộc mà tầng adaptor tồn tại để ngăn (`docs/system-architecture.md:14-25`).

@@ -23,11 +23,11 @@ Phụ thuộc: phase 2 (cần bộ eval mở rộng để phase 5 đo được; 
 
 ## Files
 
-- **Modify** `src/rag_chatbot_tung/validate.py` — thêm `Turn`, thêm `history` vào `QueryRequest` (`validate.py:56-59`).
-- **Modify** `src/rag_chatbot_tung/llm_generator/prompts.py` — `SYSTEM_PROMPT` + `build_rag_messages` dựng messages có lịch sử.
-- **Modify** `src/rag_chatbot_tung/configs.py` — `LLMSettings.history_token_budget` (`configs.py:40-56`).
+- **Modify** `src/rag_chatbot/validate.py` — thêm `Turn`, thêm `history` vào `QueryRequest` (`validate.py:56-59`).
+- **Modify** `src/rag_chatbot/llm_generator/prompts.py` — `SYSTEM_PROMPT` + `build_rag_messages` dựng messages có lịch sử.
+- **Modify** `src/rag_chatbot/configs.py` — `LLMSettings.history_token_budget` (`configs.py:40-56`).
 - **Modify** `configs/default.yaml` — khai báo `history_token_budget` dưới `llm:` (`default.yaml:16-23`).
-- **Modify** `src/rag_chatbot_tung/orchestrator.py` — truyền `request.history` xuống, log R9.
+- **Modify** `src/rag_chatbot/orchestrator.py` — truyền `request.history` xuống, log R9.
 - **Modify** `tests/test_prompts.py`, `tests/test_orchestrator.py`, `tests/test_api.py`.
 
 **Không** đụng `adaptor/protocols.py`: `LLMProvider.generate(messages)` (`protocols.py:56`) đã nhận `list[dict[str, str]]`, mà history chỉ làm danh sách đó dài thêm. Không có chữ ký nào phải đổi, không có provider nào phải sửa. Đây là phần thưởng của tầng adaptor, và cũng là kiểm chứng rằng DEC-2 chọn đúng chỗ để đặt history.

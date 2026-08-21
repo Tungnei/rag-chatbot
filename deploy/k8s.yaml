@@ -66,7 +66,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: rag-chatbot-tung:latest
+          image: rag-chatbot:latest
           ports:
             - containerPort: 8000
           env:

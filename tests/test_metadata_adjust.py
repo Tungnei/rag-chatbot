@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import unicodedata
 
-from rag_chatbot_tung.configs import MetadataAdjustSettings
-from rag_chatbot_tung.retrieval.metadata_adjust import adjust
-from rag_chatbot_tung.validate import RetrievedChunk, SourceType
+from rag_chatbot.configs import MetadataAdjustSettings
+from rag_chatbot.retrieval.metadata_adjust import adjust
+from rag_chatbot.validate import RetrievedChunk, SourceType
 
 
 def chunk(
@@ -193,8 +193,8 @@ def test_orchestrator_applies_metadata_adjust_after_rerank(
 ):
     """End to end: ten candidates from the reranker must arrive as at most top_k,
     with no source occupying more than max_per_source slots."""
-    from rag_chatbot_tung.orchestrator import RAGOrchestrator
-    from rag_chatbot_tung.validate import QueryRequest
+    from rag_chatbot.orchestrator import RAGOrchestrator
+    from rag_chatbot.validate import QueryRequest
 
     for name in ("alpha.txt", "beta.txt", "gamma.txt"):
         for i in range(3):

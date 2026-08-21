@@ -30,7 +30,7 @@ Phụ thuộc: phase 1 (nghiệm thu P1 phải sạch trước khi chồng thay 
 - **Create** `data/documents/*.md` / `*.txt` — ≥4 tài liệu mới, chủ đề khác nhau rõ rệt.
 - **Modify** `data/eval/qa.jsonl` — lên ≥40 case, ≥6 nguồn.
 - **Create** `data/eval/qa_multiturn.jsonl` — bộ multi-turn.
-- **Modify** `src/rag_chatbot_tung/evaluate/metrics.py` — `EvalCase` nhận trường mới, `EvalReport` đo theo tầng, ghi lại `score` thật.
+- **Modify** `src/rag_chatbot/evaluate/metrics.py` — `EvalCase` nhận trường mới, `EvalReport` đo theo tầng, ghi lại `score` thật.
 - **Modify** `scripts/run_eval.py` — in bảng, thêm `--baseline` để diff, thêm `--cases` cho bộ multi-turn.
 - **Create** `tests/test_metrics.py` — hiện `evaluate/` **không có test nào** [OBSERVED: `ls tests/` không có `test_metrics.py`]. Phase này sửa luôn khoảng trống đó, vì sắp tới mọi kết luận đều dựa vào module này.
 
@@ -143,7 +143,7 @@ Toàn bộ test của phase này chạy **offline**, dùng `orchestrator` fixtur
    *Đỏ vì:* file hiện 6 dòng / 2 nguồn. **Đây là test biến R1 thành một điều kiện kiểm được bằng máy** thay vì một lời nhắc trong plan.
 7. `test_every_expected_source_exists_on_disk` — mọi `expected_source` trong cả hai file phải là một file có thật trong `data/documents/`. Không có test này thì một lỗi chính tả trong tên file biến thành "retrieval kém" và người ta đi tối ưu nhầm chỗ suốt vài giờ.
 
-Lưu ý cho test 6 và 7: fixture `away_from_dotenv` (autouse) `chdir` sang `tmp_path` (`tests/conftest.py:56-67`), nên **đường dẫn tương đối sẽ trỏ sai**. Phải dựng đường dẫn tuyệt đối từ một mỏ neo trong package, ví dụ `rag_chatbot_tung.configs.PROJECT_ROOT` (`configs.py:17`). Bỏ qua chi tiết này là cách nhanh nhất để có một test đỏ vì lý do sai hoàn toàn.
+Lưu ý cho test 6 và 7: fixture `away_from_dotenv` (autouse) `chdir` sang `tmp_path` (`tests/conftest.py:56-67`), nên **đường dẫn tương đối sẽ trỏ sai**. Phải dựng đường dẫn tuyệt đối từ một mỏ neo trong package, ví dụ `rag_chatbot.configs.PROJECT_ROOT` (`configs.py:17`). Bỏ qua chi tiết này là cách nhanh nhất để có một test đỏ vì lý do sai hoàn toàn.
 
 **Implement** → xanh:
 - Viết ≥4 tài liệu mới vào `data/documents/`.
@@ -182,7 +182,7 @@ uv run mypy src
 
 - **Viết 40 case là việc tay, và việc tay thì bị cắt xén khi mệt.** Cám dỗ: sinh 40 case bằng cách diễn đạt lại 6 câu cũ. Kết quả là một bộ eval trông to mà phương sai thật vẫn bằng 6. Ràng buộc chống lại: ≥6 nguồn phân biệt, và mỗi nguồn có ≥4 case chạm vào các phần **khác nhau** của tài liệu.
 - **Rò rỉ đáp án qua từ khoá.** Nếu câu hỏi chép nguyên một cụm từ hiếm chỉ có trong đúng một tài liệu, thì cả dense lẫn BM25 đều trúng dễ dàng và bộ eval mất khả năng phân biệt hai phương pháp — đúng cái phase 7 cần đo. Viết câu hỏi bằng lời của người dùng, không bằng lời của tài liệu.
-- **Chuẩn hoá Unicode lệch nhau giữa hai đầu.** Đã kiểm và đây là một bất đối xứng có thật: mọi văn bản đi qua ingest đều được `clean_text` chuẩn hoá **NFKC** (`src/rag_chatbot_tung/utils/text.py:19-23`, gọi ở `retrieval/document_retrieval.py:89,91,97,145`), nhưng **câu hỏi thì không** — `orchestrator.py:56` đưa `request.question` thẳng vào `embed_query`. Với embedding dày thì lệch NFC/NFD chỉ làm vector nhích nhẹ; với BM25 ở phase 7 thì "máy" dạng NFC và dạng NFD là **hai term khác nhau hoàn toàn**, và câu truy vấn sẽ trượt sạch mà không ai hiểu vì sao. Phase 2 chỉ **ghi nhận** điều này (và viết dữ liệu eval ở dạng NFC nhất quán); việc xử lý thuộc phase 7 — tokenizer sparse phải tự chuẩn hoá cùng một kiểu với ingest. Đừng lặng lẽ sửa `orchestrator.py` ở đây.
+- **Chuẩn hoá Unicode lệch nhau giữa hai đầu.** Đã kiểm và đây là một bất đối xứng có thật: mọi văn bản đi qua ingest đều được `clean_text` chuẩn hoá **NFKC** (`src/rag_chatbot/utils/text.py:19-23`, gọi ở `retrieval/document_retrieval.py:89,91,97,145`), nhưng **câu hỏi thì không** — `orchestrator.py:56` đưa `request.question` thẳng vào `embed_query`. Với embedding dày thì lệch NFC/NFD chỉ làm vector nhích nhẹ; với BM25 ở phase 7 thì "máy" dạng NFC và dạng NFD là **hai term khác nhau hoàn toàn**, và câu truy vấn sẽ trượt sạch mà không ai hiểu vì sao. Phase 2 chỉ **ghi nhận** điều này (và viết dữ liệu eval ở dạng NFC nhất quán); việc xử lý thuộc phase 7 — tokenizer sparse phải tự chuẩn hoá cùng một kiểu với ingest. Đừng lặng lẽ sửa `orchestrator.py` ở đây.
 - **Bộ eval mở rộng làm hit-rate baseline TỤT so với con số cũ.** Gần như chắc chắn xảy ra: 6 case dễ trên 2 nguồn cho con số đẹp giả tạo. Đây **không phải regression** và đừng ai đọc nó như regression. Baseline được định nghĩa lại tại phase này, và mọi so sánh về sau là so với baseline mới.
 - **Chạy eval tốn tiền OpenAI thật** (R12). 40 case × 1 lần embed câu hỏi là nhỏ, nhưng lặp lại ở phase 5/7/8/9/10 thì cộng dồn. Không có cách tránh — embedding phải thật thì kết quả retrieval mới thật.
 </content>

@@ -6,7 +6,7 @@ request/ingest, bảng module, deployment: xem `docs/ARCHITECTURE.md`. Quyết �
 
 ## Hình dạng hệ thống
 
-FastAPI app (`src/rag_chatbot_tung/api/`) phục vụ cả API JSON lẫn UI tĩnh (`/ui`, `/ui/admin`
+FastAPI app (`src/rag_chatbot/api/`) phục vụ cả API JSON lẫn UI tĩnh (`/ui`, `/ui/admin`
 — vanilla HTML/CSS/JS, không build step). `RAGOrchestrator` (`orchestrator.py`) là điểm hội tụ
 duy nhất của hai luồng nghiệp vụ: `answer()` (query) và `ingest()`/`ingest_directory()`. Qdrant
 là vector store, OpenAI là embeddings, LLM là OpenAI hoặc Anthropic tuỳ config.

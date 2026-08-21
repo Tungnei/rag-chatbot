@@ -21,9 +21,9 @@ Phụ thuộc: phase 2 (mount) và **phase 4** (`GET /documents` — trang này 
 
 ## Files
 
-- **Create** `src/rag_chatbot_tung/api/static/admin/index.html`
-- **Create** `src/rag_chatbot_tung/api/static/admin/admin.js`
-- **Modify** `src/rag_chatbot_tung/api/static/styles.css` — dùng chung, thêm phần cho admin.
+- **Create** `src/rag_chatbot/api/static/admin/index.html`
+- **Create** `src/rag_chatbot/api/static/admin/admin.js`
+- **Modify** `src/rag_chatbot/api/static/styles.css` — dùng chung, thêm phần cho admin.
 - **Modify** `tests/test_ui.py`
 
 `StaticFiles(html=True)` từ phase 2 tự phục vụ `admin/index.html` cho `/ui/admin/` — không cần thêm mount thứ hai.

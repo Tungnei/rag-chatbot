@@ -5,7 +5,7 @@ import subprocess
 import sys
 import unicodedata
 
-from rag_chatbot_tung.retrieval.sparse import encode, term_index, tokenize
+from rag_chatbot.retrieval.sparse import encode, term_index, tokenize
 
 
 def test_tokenize_lowercases_and_splits_on_non_word():
@@ -62,7 +62,7 @@ def test_term_index_is_stable_across_processes():
     never catch that — hash() is perfectly stable within one process.
     """
     expected = term_index("máy")
-    code = "from rag_chatbot_tung.retrieval.sparse import term_index; print(term_index('máy'))"
+    code = "from rag_chatbot.retrieval.sparse import term_index; print(term_index('máy'))"
 
     for seed in ("0", "1", "2"):
         assert int(_run_in_subprocess(code, seed)) == expected

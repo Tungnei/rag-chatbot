@@ -5,11 +5,11 @@ import hashlib
 import pytest
 from qdrant_client import QdrantClient
 
-from rag_chatbot_tung.chunking import TextSplitter
-from rag_chatbot_tung.configs import Settings
-from rag_chatbot_tung.orchestrator import RAGOrchestrator
-from rag_chatbot_tung.retrieval import IngestionPipeline, QdrantVectorStore
-from rag_chatbot_tung.validate import GenerationResult
+from rag_chatbot.chunking import TextSplitter
+from rag_chatbot.configs import Settings
+from rag_chatbot.orchestrator import RAGOrchestrator
+from rag_chatbot.retrieval import IngestionPipeline, QdrantVectorStore
+from rag_chatbot.validate import GenerationResult
 
 VECTOR_SIZE = 16
 

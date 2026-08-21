@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from rag_chatbot_tung.configs import EmbeddingSettings, LLMSettings
-from rag_chatbot_tung.embeddings import OpenAIEmbedder
-from rag_chatbot_tung.llm_generator import OpenAILLM
+from rag_chatbot.configs import EmbeddingSettings, LLMSettings
+from rag_chatbot.embeddings import OpenAIEmbedder
+from rag_chatbot.llm_generator import OpenAILLM
 
 
 class FakeModels:

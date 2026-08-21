@@ -34,7 +34,7 @@ docker run -d -p 6333:6333 -v qdrant_storage:/qdrant/storage qdrant/qdrant
 
 cp .env.example .env      # set OPENAI_API_KEY
 uv run python scripts/ingest.py
-uv run rag-chatbot-tung
+uv run rag-chatbot
 ```
 
 ## Environment variables
@@ -101,7 +101,7 @@ Off by default, and deliberately not part of a normal install — it pulls in to
 
 ```bash
 uv sync --extra rerank            # adds sentence-transformers + CPU-only torch
-RERANK__PROVIDER=cross_encoder uv run rag-chatbot-tung
+RERANK__PROVIDER=cross_encoder uv run rag-chatbot
 ```
 
 torch is pinned to the CPU wheel index; without that pin it drags in the entire CUDA
@@ -110,7 +110,7 @@ toolkit, which is several gigabytes of GPU runtime for a model this project runs
 For containers, build the separate target rather than the default one:
 
 ```bash
-docker build --target runtime-rerank -t rag-chatbot-tung:rerank .
+docker build --target runtime-rerank -t rag-chatbot:rerank .
 ```
 
 The default `runtime` target is untouched by any of this, so an operator who does not

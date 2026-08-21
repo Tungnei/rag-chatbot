@@ -21,9 +21,9 @@ Phụ thuộc: phase 2.
 
 ## Files
 
-- **Modify** `src/rag_chatbot_tung/api/static/index.html` — thay placeholder bằng trang thật.
-- **Create** `src/rag_chatbot_tung/api/static/styles.css`
-- **Create** `src/rag_chatbot_tung/api/static/app.js`
+- **Modify** `src/rag_chatbot/api/static/index.html` — thay placeholder bằng trang thật.
+- **Create** `src/rag_chatbot/api/static/styles.css`
+- **Create** `src/rag_chatbot/api/static/app.js`
 - **Modify** `tests/test_ui.py` — thêm nhóm test cho trang chat.
 
 Tách ba file thay vì nhồi một `index.html` là mở rộng có chủ ý của DEC-1: quyết định đó khoá "trang tĩnh vanilla JS, không thêm dependency", không khoá số lượng file. Ba file vẫn không cần build step.

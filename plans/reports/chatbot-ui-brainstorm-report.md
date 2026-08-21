@@ -8,13 +8,13 @@ Quyết định đã ghi: DEC-1, DEC-2, DEC-3 trong [docs/decisions.md](../../do
 
 | Sự kiện | Bằng chứng |
 |---|---|
-| `POST /query` stateless, một lượt, không có trường lịch sử | `src/rag_chatbot_tung/api/routes.py:35-37`, `src/rag_chatbot_tung/validate.py:56-68` |
-| Không streaming — handler đồng bộ, trả nguyên câu trả lời | `src/rag_chatbot_tung/orchestrator.py:68-83` |
-| Không xác thực, CORS mở toàn bộ | `src/rag_chatbot_tung/api/app.py:42-47`, `configs/default.yaml:30-35` |
+| `POST /query` stateless, một lượt, không có trường lịch sử | `src/rag_chatbot/api/routes.py:35-37`, `src/rag_chatbot/validate.py:56-68` |
+| Không streaming — handler đồng bộ, trả nguyên câu trả lời | `src/rag_chatbot/orchestrator.py:68-83` |
+| Không xác thực, CORS mở toàn bộ | `src/rag_chatbot/api/app.py:42-47`, `configs/default.yaml:30-35` |
 | Chưa có hạ tầng frontend nào | `pyproject.toml:10-24`, không có `StaticFiles`, không có `web/` |
 | Dockerfile copy thẳng `src` vào image | `Dockerfile:24` |
-| Mỗi câu trả lời kèm `sources[]` có `snippet`, `score`, `page` | `src/rag_chatbot_tung/orchestrator.py:118-128` |
-| LLM được yêu cầu trích dẫn dạng `[1] [2]`, khớp thứ tự `sources[]` | `src/rag_chatbot_tung/llm_generator/prompts.py:15` |
+| Mỗi câu trả lời kèm `sources[]` có `snippet`, `score`, `page` | `src/rag_chatbot/orchestrator.py:118-128` |
+| LLM được yêu cầu trích dẫn dạng `[1] [2]`, khớp thứ tự `sources[]` | `src/rag_chatbot/llm_generator/prompts.py:15` |
 | Đã có thước đo retrieval: hit-rate và MRR | `scripts/run_eval.py`, `data/eval/qa.jsonl` |
 
 ## 2. So sánh hướng triển khai UI
@@ -37,7 +37,7 @@ Yêu cầu ban đầu chứa ba mối quan tâm độc lập, nên được tác
 
 Phạm vi: thuần frontend, không đụng backend.
 
-- `src/rag_chatbot_tung/api/static/index.html`, mount `StaticFiles(directory=..., html=True)` tại `/ui`.
+- `src/rag_chatbot/api/static/index.html`, mount `StaticFiles(directory=..., html=True)` tại `/ui`.
 - Trang quản trị tách đường dẫn riêng `/ui/admin` — upload, xem `/collections`, xoá nguồn.
 - Bảng tham số bám ràng buộc schema: `top_k` 1-20, toggle `include_sources`, hiện `latency_ms` và `tokens_used`.
 - Trích dẫn `[n]` trong câu trả lời bấm được, bung snippet tương ứng trong `sources[n-1]`.

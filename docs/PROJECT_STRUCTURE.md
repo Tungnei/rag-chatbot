@@ -1,8 +1,8 @@
 # Project Structure
 
 ```
-rag-chatbot-tung/
-├── src/rag_chatbot_tung/
+rag-chatbot/
+├── src/rag_chatbot/
 │   ├── __init__.py                     # __version__ and main() → uvicorn
 │   ├── configs.py                      # Settings, get_settings()
 │   ├── logging.py                      # setup_logging(), get_logger()

@@ -34,7 +34,7 @@
     {
       "name": "wheel-packaging",
       "status": "PASS",
-      "detail": "uv build --wheel: cả 5 file tĩnh nằm trong rag_chatbot_tung/api/static/. R3 khép lại — cả đường /app/src lẫn đường site-packages đều có file."
+      "detail": "uv build --wheel: cả 5 file tĩnh nằm trong rag_chatbot/api/static/. R3 khép lại — cả đường /app/src lẫn đường site-packages đều có file."
     },
     {
       "name": "independent-review",

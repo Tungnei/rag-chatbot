@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import pytest
 
-from rag_chatbot_tung.llm_generator.prompts import (
+from rag_chatbot.llm_generator.prompts import (
     SYSTEM_PROMPT,
     build_rag_messages,
     format_context,
 )
-from rag_chatbot_tung.utils import count_tokens
-from rag_chatbot_tung.validate import RetrievedChunk, SourceType, Turn
+from rag_chatbot.utils import count_tokens
+from rag_chatbot.validate import RetrievedChunk, SourceType, Turn
 
 
 def chunk(text: str, index: int = 0, page: int | None = None) -> RetrievedChunk:

@@ -14,9 +14,9 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-from rag_chatbot_tung.configs import get_settings
-from rag_chatbot_tung.logging import setup_logging
-from rag_chatbot_tung.orchestrator import RAGOrchestrator
+from rag_chatbot.configs import get_settings
+from rag_chatbot.logging import setup_logging
+from rag_chatbot.orchestrator import RAGOrchestrator
 
 SNAPSHOT_DIR = Path("data/eval")
 SNAPSHOT_PREFIX = "migration-snapshot-"

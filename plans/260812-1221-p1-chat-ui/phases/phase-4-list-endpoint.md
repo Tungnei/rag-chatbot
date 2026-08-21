@@ -23,11 +23,11 @@ Phụ thuộc: phase 1 (môi trường test). Độc lập với phase 2 và 3 v
 
 ## Files
 
-- **Modify** `src/rag_chatbot_tung/validate.py` — thêm `DocumentSummary`, `DocumentList`.
-- **Modify** `src/rag_chatbot_tung/adaptor/protocols.py` — thêm `list_sources()` vào `VectorStore` Protocol.
-- **Modify** `src/rag_chatbot_tung/retrieval/vector_search.py` — cài `list_sources()` trong `QdrantVectorStore`.
-- **Modify** `src/rag_chatbot_tung/orchestrator.py` — thêm `list_documents()`.
-- **Modify** `src/rag_chatbot_tung/api/routes.py` — thêm route `GET /documents`.
+- **Modify** `src/rag_chatbot/validate.py` — thêm `DocumentSummary`, `DocumentList`.
+- **Modify** `src/rag_chatbot/adaptor/protocols.py` — thêm `list_sources()` vào `VectorStore` Protocol.
+- **Modify** `src/rag_chatbot/retrieval/vector_search.py` — cài `list_sources()` trong `QdrantVectorStore`.
+- **Modify** `src/rag_chatbot/orchestrator.py` — thêm `list_documents()`.
+- **Modify** `src/rag_chatbot/api/routes.py` — thêm route `GET /documents`.
 - **Modify** `tests/test_vector_search.py`, `tests/test_api.py` — test cho tầng store và tầng HTTP.
 
 Thêm method vào `VectorStore` Protocol là thay đổi có sức lan: mọi implementation phải có nó. Đã kiểm: hiện chỉ có **một** implementation là `QdrantVectorStore`, và `tests/conftest.py` dùng chính lớp đó với `QdrantClient(":memory:")` (`tests/conftest.py:69-73`) chứ không có fake vector store nào. Nên không có lớp giả nào phải cập nhật theo.

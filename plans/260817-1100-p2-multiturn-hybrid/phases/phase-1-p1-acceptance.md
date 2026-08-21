@@ -57,7 +57,7 @@ Bốn lệnh lấy từ `docs/code-standards.md:10-15`. Con số 78 lấy từ `
 docker compose up -d qdrant          # hoặc: docker run -d -p 6333:6333 qdrant/qdrant
 cp .env.example .env                 # đặt OPENAI_API_KEY thật
 uv run python scripts/ingest.py      # nạp data/documents/
-uv run rag-chatbot-tung
+uv run rag-chatbot
 ```
 
 Lệnh lấy từ `docs/SETUP.md` mục "Option B". `scripts/ingest.py` nạp `data/documents/`, hiện có `sample_faq.txt` và `sample_guide.md` [OBSERVED: `git ls-files data/`].

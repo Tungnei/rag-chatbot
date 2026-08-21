@@ -63,7 +63,7 @@ Interactive API docs: <http://localhost:8000/docs>
 uv sync                                       # Python 3.11 + dependencies
 docker run -p 6333:6333 qdrant/qdrant         # vector store
 uv run python scripts/ingest.py               # index data/documents/
-uv run rag-chatbot-tung                       # start the API
+uv run rag-chatbot                       # start the API
 ```
 
 ## API

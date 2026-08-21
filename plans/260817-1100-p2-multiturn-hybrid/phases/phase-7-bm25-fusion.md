@@ -27,14 +27,14 @@ Phụ thuộc: phase 6 (schema `bm25` phải tồn tại).
 
 ## Files
 
-- **Create** `src/rag_chatbot_tung/retrieval/sparse.py` — tokenizer + mã hoá term-frequency.
-- **Modify** `src/rag_chatbot_tung/adaptor/protocols.py` — `SparseVector`, `VectorPoint.sparse`, tham số `query_text` cho `VectorStore.search`.
-- **Modify** `src/rag_chatbot_tung/retrieval/vector_search.py` — prefetch + `FusionQuery(RRF)`.
-- **Modify** `src/rag_chatbot_tung/retrieval/document_retrieval.py` — sinh sparse vector lúc ingest.
-- **Modify** `src/rag_chatbot_tung/retrieval/__init__.py` — export những gì cần.
-- **Modify** `src/rag_chatbot_tung/orchestrator.py` — truyền `query_text`.
-- **Modify** `src/rag_chatbot_tung/evaluate/metrics.py` — truyền `query_text` (nếu không thì eval đo đường cũ và bảng của phase 10 vô nghĩa).
-- **Modify** `src/rag_chatbot_tung/configs.py`, `configs/default.yaml` — `RetrieverSettings` mở rộng.
+- **Create** `src/rag_chatbot/retrieval/sparse.py` — tokenizer + mã hoá term-frequency.
+- **Modify** `src/rag_chatbot/adaptor/protocols.py` — `SparseVector`, `VectorPoint.sparse`, tham số `query_text` cho `VectorStore.search`.
+- **Modify** `src/rag_chatbot/retrieval/vector_search.py` — prefetch + `FusionQuery(RRF)`.
+- **Modify** `src/rag_chatbot/retrieval/document_retrieval.py` — sinh sparse vector lúc ingest.
+- **Modify** `src/rag_chatbot/retrieval/__init__.py` — export những gì cần.
+- **Modify** `src/rag_chatbot/orchestrator.py` — truyền `query_text`.
+- **Modify** `src/rag_chatbot/evaluate/metrics.py` — truyền `query_text` (nếu không thì eval đo đường cũ và bảng của phase 10 vô nghĩa).
+- **Modify** `src/rag_chatbot/configs.py`, `configs/default.yaml` — `RetrieverSettings` mở rộng.
 - **Create** `tests/test_sparse.py`.
 - **Modify** `tests/test_vector_search.py`.
 
@@ -58,8 +58,8 @@ Danh sách đầy đủ 6 call site (không phải "cập nhật tất cả call
 
 | Call site | Phải sửa? |
 |---|---|
-| `src/rag_chatbot_tung/orchestrator.py:55` | **Có** — truyền `query_text=request.question` |
-| `src/rag_chatbot_tung/evaluate/metrics.py:50` | **Có** — truyền `query_text=case.question` |
+| `src/rag_chatbot/orchestrator.py:55` | **Có** — truyền `query_text=request.question` |
+| `src/rag_chatbot/evaluate/metrics.py:50` | **Có** — truyền `query_text=case.question` |
 | `tests/test_vector_search.py:22` | Không — dense-only, và **phải giữ nguyên** làm bằng chứng không hồi quy |
 | `tests/test_vector_search.py:30` | Không — cùng lý do |
 | `tests/test_vector_search.py:38` | Không — cùng lý do |
@@ -216,7 +216,7 @@ retriever:
    for seed in ("0", "1", "2"):
        out = subprocess.run(
            [sys.executable, "-c",
-            "from rag_chatbot_tung.retrieval.sparse import term_index; print(term_index('máy'))"],
+            "from rag_chatbot.retrieval.sparse import term_index; print(term_index('máy'))"],
            env={**os.environ, "PYTHONHASHSEED": seed},
            capture_output=True, text=True, check=True,
        )
@@ -267,8 +267,8 @@ uv run mypy src
 - [ ] 11 test mới xanh, gồm **cả** test đối chứng số 6. Test 6 thiếu = phase chưa xong.
 - [ ] 4 call site `search` cũ xanh không sửa.
 - [ ] Bốn cổng sạch, tổng test không giảm.
-- [ ] `grep -rn "hash(" src/rag_chatbot_tung/retrieval/sparse.py` → không có `hash(` trần nào.
-- [ ] `grep -rn "qdrant" src/rag_chatbot_tung/adaptor/protocols.py` → rỗng (tầng adaptor vẫn sạch hạ tầng).
+- [ ] `grep -rn "hash(" src/rag_chatbot/retrieval/sparse.py` → không có `hash(` trần nào.
+- [ ] `grep -rn "qdrant" src/rag_chatbot/adaptor/protocols.py` → rỗng (tầng adaptor vẫn sạch hạ tầng).
 - [ ] `retriever.hybrid` mặc định `false`; suite chạy với mặc định đó.
 - [ ] **B2**: với `hybrid=true` trên collection có dữ liệu, mọi case `expected_source: null` trong `qa.jsonl` vẫn trả `NO_CONTEXT_ANSWER`. Đây là test **duy nhất** trong cả plan chạy nhánh `hybrid=true` với câu hỏi lạc đề — thiếu nó thì lỗ hổng grounding không có gì canh.
 - [ ] **B2**: sàn sparse hoặc là một con số **đo được từ phân bố điểm BM25 trên bộ eval** (ghi cả con số lẫn cách đo vào verification), hoặc là `None` kèm ghi chú chỉ dùng điều kiện dense-set. Không được có số chọn tay không giải thích được.

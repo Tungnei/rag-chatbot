@@ -21,8 +21,8 @@ Phụ thuộc: phase 1 (phải chạy được `pytest`).
 
 ## Files
 
-- **Modify** `src/rag_chatbot_tung/api/app.py` — import `StaticFiles`, khai báo `STATIC_DIR`, mount sau `include_router`.
-- **Create** `src/rag_chatbot_tung/api/static/index.html` — placeholder tối thiểu, hợp lệ HTML5.
+- **Modify** `src/rag_chatbot/api/app.py` — import `StaticFiles`, khai báo `STATIC_DIR`, mount sau `include_router`.
+- **Create** `src/rag_chatbot/api/static/index.html` — placeholder tối thiểu, hợp lệ HTML5.
 - **Create** `tests/test_ui.py` — file test mới, tách khỏi `tests/test_api.py` để phase 3 và 4 mở rộng cùng một chỗ.
 
 Hình dạng thay đổi trong `app.py` (mount **sau** `app.include_router(router)` ở dòng 58, không phải trước):

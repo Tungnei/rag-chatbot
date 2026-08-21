@@ -6,7 +6,7 @@ status: active
 date: 2026-08-12
 actor: "user:v.tungnt200@vinsmartfuture.tech"
 ts: "2026-08-12T04:49:02.326808+00:00"
-affects: "src/rag_chatbot_tung/api/app.py,src/rag_chatbot_tung/api/static/,tests/test_api.py,Dockerfile"
+affects: "src/rag_chatbot/api/app.py,src/rag_chatbot/api/static/,tests/test_api.py,Dockerfile"
 ---
 
 ## DEC-1 — Giao dien chatbot: trang tinh vanilla JS do FastAPI phuc vu tai /ui
@@ -19,7 +19,7 @@ status: active
 date: 2026-08-12
 actor: "user:v.tungnt200@vinsmartfuture.tech"
 ts: "2026-08-12T04:49:15.827701+00:00"
-affects: "src/rag_chatbot_tung/validate.py,src/rag_chatbot_tung/orchestrator.py,src/rag_chatbot_tung/llm_generator/prompts.py,data/eval/qa.jsonl"
+affects: "src/rag_chatbot/validate.py,src/rag_chatbot/orchestrator.py,src/rag_chatbot/llm_generator/prompts.py,data/eval/qa.jsonl"
 ---
 
 ## DEC-2 — Hoi thoai nhieu luot: client gui history, server van stateless, chi embed cau hoi hien tai
@@ -32,7 +32,7 @@ status: active
 date: 2026-08-12
 actor: "user:v.tungnt200@vinsmartfuture.tech"
 ts: "2026-08-12T04:49:29.456056+00:00"
-affects: "configs/default.yaml,src/rag_chatbot_tung/api/app.py,src/rag_chatbot_tung/api/routes.py,docker-compose.yaml,deploy/k8s.yaml"
+affects: "configs/default.yaml,src/rag_chatbot/api/app.py,src/rag_chatbot/api/routes.py,docker-compose.yaml,deploy/k8s.yaml"
 ---
 
 ## DEC-3 — Cong khai internet chi sau khi co reverse proxy auth; khong tu viet auth trong FastAPI
@@ -45,7 +45,7 @@ status: active
 date: 2026-08-12
 actor: "user:v.tungnt200@vinsmartfuture.tech"
 ts: "2026-08-12T07:06:38.217922+00:00"
-affects: "src/rag_chatbot_tung/validate.py,src/rag_chatbot_tung/adaptor/protocols.py,src/rag_chatbot_tung/retrieval/vector_search.py,src/rag_chatbot_tung/orchestrator.py,src/rag_chatbot_tung/api/routes.py"
+affects: "src/rag_chatbot/validate.py,src/rag_chatbot/adaptor/protocols.py,src/rag_chatbot/retrieval/vector_search.py,src/rag_chatbot/orchestrator.py,src/rag_chatbot/api/routes.py"
 ---
 
 ## DEC-4 — Them GET /documents de trang admin liet ke nguon that trong index
@@ -58,7 +58,7 @@ status: active
 date: 2026-08-13
 actor: "user:v.tungnt200@vinsmartfuture.tech"
 ts: "2026-08-13T11:07:20.326241+00:00"
-affects: "src/rag_chatbot_tung/providers.py,src/rag_chatbot_tung/configs.py,src/rag_chatbot_tung/llm_generator/anthropic_llm.py,src/rag_chatbot_tung/orchestrator.py,pyproject.toml,.env.example"
+affects: "src/rag_chatbot/providers.py,src/rag_chatbot/configs.py,src/rag_chatbot/llm_generator/anthropic_llm.py,src/rag_chatbot/orchestrator.py,pyproject.toml,.env.example"
 ---
 
 ## DEC-5 — Chon LLM provider bang env; embeddings vinh vien tach rieng va o lai OpenAI
@@ -71,7 +71,7 @@ status: active
 date: 2026-08-14
 actor: "user:v.tungnt200@vinsmartfuture.tech"
 ts: "2026-08-14T07:13:01.303595+00:00"
-affects: "src/rag_chatbot_tung/configs.py,src/rag_chatbot_tung/llm_generator/anthropic_llm.py,src/rag_chatbot_tung/llm_generator/openai_llm.py,src/rag_chatbot_tung/embeddings/openai_embedder.py,.env.example"
+affects: "src/rag_chatbot/configs.py,src/rag_chatbot/llm_generator/anthropic_llm.py,src/rag_chatbot/llm_generator/openai_llm.py,src/rag_chatbot/embeddings/openai_embedder.py,.env.example"
 ---
 
 ## DEC-6 — Them LLM__BASE_URL / EMBEDDINGS__BASE_URL de tro toi gateway cung giao thuc
@@ -97,7 +97,7 @@ status: active
 date: 2026-08-18
 actor: "user:v.tungnt200@vinsmartfuture.tech"
 ts: "2026-08-18T11:23:58.959622+00:00"
-affects: "docs/decisions.md, scripts/run_eval.py, src/rag_chatbot_tung/evaluate/metrics.py, data/eval/qa_multiturn.jsonl"
+affects: "docs/decisions.md, scripts/run_eval.py, src/rag_chatbot/evaluate/metrics.py, data/eval/qa_multiturn.jsonl"
 ---
 
 ## DEC-8 — Cong query-rewriting cua DEC-2 van DONG: do duoc voi n=12 chua du ket luan
@@ -110,7 +110,7 @@ status: active
 date: 2026-08-18
 actor: "user:v.tungnt200@vinsmartfuture.tech"
 ts: "2026-08-18T11:27:16.792856+00:00"
-affects: "src/rag_chatbot_tung/retrieval/vector_search.py, scripts/migrate_collection.py, configs/default.yaml, docs/SETUP.md"
+affects: "src/rag_chatbot/retrieval/vector_search.py, scripts/migrate_collection.py, configs/default.yaml, docs/SETUP.md"
 ---
 
 ## DEC-9 — Chen hybrid retrieval vao giua P2 va P3 hardening — deviation co y thuc khoi thu tu DEC-3
@@ -123,7 +123,7 @@ status: active
 date: 2026-08-19
 actor: "user:v.tungnt200@vinsmartfuture.tech"
 ts: "2026-08-19T07:32:21.627515+00:00"
-affects: "configs/default.yaml, src/rag_chatbot_tung/configs.py, docs/ARCHITECTURE.md, docs/system-architecture.md, README.md"
+affects: "configs/default.yaml, src/rag_chatbot/configs.py, docs/ARCHITECTURE.md, docs/system-architecture.md, README.md"
 ---
 
 ## DEC-10 — Ket luan phan B: bat hybrid fusion, de rerank va metadata TAT mac dinh

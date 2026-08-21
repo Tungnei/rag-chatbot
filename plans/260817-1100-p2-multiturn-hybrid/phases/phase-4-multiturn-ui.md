@@ -17,14 +17,14 @@ Cho trang `/ui` thật sự nhớ: `app.js` giữ mảng lịch sử trong bộ 
 
 Không có dòng Python nào. Toàn bộ phase là hai file tĩnh và một file test.
 
-Điểm đáng chú ý duy nhất về kỷ luật: `tests/test_ui.py:91` `test_page_states_single_turn` đang khẳng định `id="single-turn-notice"` có trong HTML (`src/rag_chatbot_tung/api/static/index.html:17`). Test đó **sẽ đỏ, và đỏ đúng** — nó đang bảo vệ một lời hứa mà phase này cố ý phá. **Sửa test, không xoá test.**
+Điểm đáng chú ý duy nhất về kỷ luật: `tests/test_ui.py:91` `test_page_states_single_turn` đang khẳng định `id="single-turn-notice"` có trong HTML (`src/rag_chatbot/api/static/index.html:17`). Test đó **sẽ đỏ, và đỏ đúng** — nó đang bảo vệ một lời hứa mà phase này cố ý phá. **Sửa test, không xoá test.**
 
 Phụ thuộc: phase 3 (backend phải nhận `history` trước, nếu không UI gửi lên chỉ nhận 422).
 
 ## Files
 
-- **Modify** `src/rag_chatbot_tung/api/static/app.js` — giữ mảng history, gửi 6 phần tử cuối.
-- **Modify** `src/rag_chatbot_tung/api/static/index.html` — thay `#single-turn-notice` bằng `#history-notice`.
+- **Modify** `src/rag_chatbot/api/static/app.js` — giữ mảng history, gửi 6 phần tử cuối.
+- **Modify** `src/rag_chatbot/api/static/index.html` — thay `#single-turn-notice` bằng `#history-notice`.
 - **Modify** `tests/test_ui.py` — sửa `test_page_states_single_turn`, thêm test cho `app.js`.
 
 **Không** đụng `styles.css`: chỉ báo mới dùng lại class `notice` và `muted` đã có (`index.html:17`, `app.js:120,139`). Giữ được như vậy thì phase này không tranh chấp file nào với phase khác, và diff dễ đọc.
@@ -114,7 +114,7 @@ uv run mypy src
 - [ ] `test_no_static_asset_injects_markup` vẫn xanh, và `len(assets) >= 4` vẫn đúng (`tests/test_ui.py:83`).
 - [ ] 3 test mới xanh, tổng không giảm.
 - [ ] Bốn cổng sạch.
-- [ ] `grep -c "single-turn-notice" src/rag_chatbot_tung/api/static/index.html` → `0`.
+- [ ] `grep -c "single-turn-notice" src/rag_chatbot/api/static/index.html` → `0`.
 
 **Nghiệm thu bằng tay** (cần Qdrant + `OPENAI_API_KEY` thật + tài liệu đã nạp — tốn tiền thật):
 

@@ -15,7 +15,7 @@ harness_schema_version: 1.0
 
 **Đây là phase phá vỡ tương thích. Làm sai là mất index.**
 
-Collection hiện dùng **vector không tên** — `ensure_collection` truyền `models.VectorParams(...)` trần vào `vectors_config` (`src/rag_chatbot_tung/retrieval/vector_search.py:50-56`). Hybrid cần **vector có tên**: `dense` + sparse `bm25`. Đây không phải thay đổi thêm-vào; nó là schema khác hẳn, và Qdrant từ chối trộn hai kiểu [OBSERVED: upsert vector không tên vào collection có tên → `ValueError: Unnamed vectors are not allowed when a collection has named vectors or multivectors: ['dense'], []`].
+Collection hiện dùng **vector không tên** — `ensure_collection` truyền `models.VectorParams(...)` trần vào `vectors_config` (`src/rag_chatbot/retrieval/vector_search.py:50-56`). Hybrid cần **vector có tên**: `dense` + sparse `bm25`. Đây không phải thay đổi thêm-vào; nó là schema khác hẳn, và Qdrant từ chối trộn hai kiểu [OBSERVED: upsert vector không tên vào collection có tên → `ValueError: Unnamed vectors are not allowed when a collection has named vectors or multivectors: ['dense'], []`].
 
 **Phase này KHÔNG bật hybrid.** Nó chỉ đổi schema và chứng minh đường dense-only vẫn cho kết quả tương đương sau khi đổi. Tách như vậy để khi phase 7 làm hỏng chất lượng retrieval, ta biết chắc thủ phạm là fusion chứ không phải migration.
 
@@ -33,13 +33,13 @@ Phần B **không nằm trong thứ tự đã chốt ở DEC-3** (P1 → P2 mult
 - Lý do (người dùng chốt phạm vi gồm cả phần B).
 - Cái gì bị đẩy lùi vì nó (P3 hardening).
 - Chi phí đã biết được chấp nhận: một lần re-ingest toàn bộ, cộng dependency nặng ở phase 8.
-- `affects:` phải liệt kê `src/rag_chatbot_tung/retrieval/vector_search.py`, `scripts/migrate_collection.py`, `configs/default.yaml`.
+- `affects:` phải liệt kê `src/rag_chatbot/retrieval/vector_search.py`, `scripts/migrate_collection.py`, `configs/default.yaml`.
 
 Plan này **không tự lật DEC-3**. Đây là success criterion đầu tiên và kiểm được bằng `grep`.
 
 ## Files
 
-- **Modify** `src/rag_chatbot_tung/retrieval/vector_search.py` — schema có tên, phát hiện schema cũ, `upsert`/`search` dùng tên vector.
+- **Modify** `src/rag_chatbot/retrieval/vector_search.py` — schema có tên, phát hiện schema cũ, `upsert`/`search` dùng tên vector.
 - **Create** `scripts/migrate_collection.py` — dựng lại collection và nạp lại.
 - **Modify** `tests/test_vector_search.py` — test cho nhánh phát hiện schema.
 - **Modify** `docs/SETUP.md` — quy trình migrate.

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from rag_chatbot_tung.llm_generator import NO_CONTEXT_ANSWER
-from rag_chatbot_tung.utils import count_tokens
-from rag_chatbot_tung.validate import IngestRequest, QueryRequest, Turn
+from rag_chatbot.llm_generator import NO_CONTEXT_ANSWER
+from rag_chatbot.utils import count_tokens
+from rag_chatbot.validate import IngestRequest, QueryRequest, Turn
 
 
 def test_answer_without_indexed_documents_skips_llm(orchestrator, llm):

@@ -6,11 +6,11 @@ import sys
 
 import pytest
 
-from rag_chatbot_tung.configs import Settings
-from rag_chatbot_tung.embeddings import OpenAIEmbedder
-from rag_chatbot_tung.llm_generator import AnthropicLLM, OpenAILLM
-from rag_chatbot_tung.providers import build_embedder, build_llm, build_reranker
-from rag_chatbot_tung.rerank import NoopReranker
+from rag_chatbot.configs import Settings
+from rag_chatbot.embeddings import OpenAIEmbedder
+from rag_chatbot.llm_generator import AnthropicLLM, OpenAILLM
+from rag_chatbot.providers import build_embedder, build_llm, build_reranker
+from rag_chatbot.rerank import NoopReranker
 
 
 def make_settings(**overrides) -> Settings:

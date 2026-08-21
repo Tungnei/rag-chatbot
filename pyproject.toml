@@ -1,5 +1,5 @@
 [project]
-name = "rag-chatbot-tung"
+name = "rag-chatbot"
 version = "0.1.0"
 description = "A Retrieval Augmented Generation chatbot for intelligent document Q&A"
 readme = "README.md"
@@ -34,7 +34,7 @@ jupyter = [
 ]
 
 [project.scripts]
-rag-chatbot-tung = "rag_chatbot_tung:main"
+rag-chatbot = "rag_chatbot:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]

@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from rag_chatbot_tung.api.app import STATIC_DIR, create_app
+from rag_chatbot.api.app import STATIC_DIR, create_app
 
 
 @pytest.fixture
